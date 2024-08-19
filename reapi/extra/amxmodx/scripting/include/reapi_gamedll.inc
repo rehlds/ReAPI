@@ -1221,3 +1221,201 @@ native rg_player_relationship(const player, const target);
 * @noreturn
 */
 native rg_send_death_message(const pKiller, const pVictim, const pAssister, const pevInflictor, const killerWeaponName[], const DeathMessageFlags:iDeathMessageFlags, const KillRarity:iRarityOfKill);
+
+/*
+* -
+*
+* @param classname             Classname to search for
+*
+* @noreturn
+*/
+native rg_restart_other(const classname[]);
+
+/*
+* -
+*
+* @noreturn
+*/
+native rg_reset_entities();
+
+/*
+* -
+*
+* @param classname             Classname to search for
+* @param removeCount           Remove count
+*
+* @noreturn
+*/
+native rg_remove_other(const classname[], const removeCount);
+
+/*
+* -
+*
+* @param seed                  Seed
+* @param low                   Low
+* @param high                  High
+*
+* @return                      -
+*/
+native rg_shared_random_long(const seed, const low, const high);
+
+/*
+* -
+*
+* @param seed                  Seed
+* @param low                   Low
+* @param high                  High
+*
+* @return                      -
+*/
+native Float:rg_shared_random_float(const seed, const Float:low, const Float:high);
+
+/*
+* -
+*
+* @param groupmask             Group Mask
+* @param op                    Operation
+*
+* @noreturn
+*/
+native rg_set_group_trace(const groupmask, const op);
+
+
+/*
+* -
+*
+* @noreturn
+*/
+native rg_unset_group_trace();
+
+/*
+* -
+*
+* @param start_index           Entity index to start searching from. AMX_NULLENT (-1) to start from the first entity
+* @param vecCenter             Center
+* @param radius                Radius
+*
+* @return                      Entity index > 0 if found, 0 otherwise
+*/
+native rg_find_entity_in_sphere(const start_index, Float:vecCenter[3], const Float:radius);
+
+/*
+* -
+*
+* @param vecCenter             Center
+* @param amplitude             Amplitude
+* @param frequency             Frequency
+* @param duration              Duration
+* @param radius                Radius
+*
+* @noreturn
+*/
+native rg_screen_shake(Float:vecCenter[3], const Float:amplitude, const Float:frequency, const Float:duration, const Float:radius);
+
+/*
+* -
+*
+* @param vecColor              Color
+* @param fadeTime              Fade Time
+* @param fadeHold              Fade Hold
+* @param alpha                 Alpha
+* @param flags                 Flags
+*
+* @noreturn
+*/
+native rg_screen_fade_all(Float:vecColor[3], const Float:fadeTime, const Float:fadeHold, const alpha, const flags);
+
+/*
+* -
+*
+* @param index                 Client index
+* @param vecColor              Color
+* @param fadeTime              Fade Time
+* @param fadeHold              Fade Hold
+* @param alpha                 Alpha
+* @param flags                 Flags
+*
+* @noreturn
+*/
+native rg_screen_fade(const index, Float:vecColor[3], const Float:fadeTime, const Float:fadeHold, const alpha, const flags);
+
+/*
+* -
+*
+* @param index                 Entity index
+* @param vecMin                Min
+* @param vecMax                Max
+*
+* @noreturn
+*/
+native rg_set_size(const index, Float:vecMin[3], Float:vecMax[3]);
+
+/*
+* -
+*
+* @param index                 Entity index
+* @param vecOrigin             Origin
+*
+* @noreturn
+*/
+native rg_set_origin(const index, Float:vecOrigin[3]);
+
+/*
+* -
+*
+* @param vec                   Origin
+*
+* @return                      -
+*/
+native rg_point_contents(Float:vec[3]);
+
+/*
+* -
+*
+* @param position              Entity index
+* @param minz                  Min Z
+* @param maxz                  Max Z
+*
+* @return                      -
+*/
+native Float:rg_water_level(Float:position[3], const Float:minz, const Float:maxz);
+
+/*
+* -
+*
+* @param vecMins               Mins
+* @param vecMaxs               Maxs
+* @param bubbleCount           Bubble Count
+*
+* @noreturn
+*/
+native rg_bubbles(Float:vecMins[3], Float:vecMaxs[3], const bubbleCount);
+
+/*
+* -
+*
+* @param from                  Start position
+* @param to                    End position
+* @param bubbleCount           Bubble Count
+*
+* @noreturn
+*/
+native rg_bubble_trail(Float:from[3], Float:to[3], const bubbleCount);
+
+/*
+* -
+*
+* @param classname             Classname to search for
+*
+* @return                      Entities Count
+*/
+native rg_count_entities(const classname[]);
+
+/*
+* -
+*
+* @param spot                  Spot to check
+*
+* @return                      1 on success, 0 otherwise
+*/
+native bool:rg_is_spawn_point_occupied(const spot);

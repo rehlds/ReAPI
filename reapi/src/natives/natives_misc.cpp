@@ -3345,6 +3345,210 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 	return TRUE;
 }
 
+cell AMX_NATIVE_CALL rg_restart_other(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_classname };
+
+	char classname[256];
+	const char* value = getAmxString(amx, params[arg_classname], classname);
+
+	g_ReGameFuncs->UTIL_RestartOther(value);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_reset_entities(AMX* amx, cell* params)
+{
+	enum args_e { arg_count };
+
+	g_ReGameFuncs->UTIL_ResetEntities();
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_remove_other(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_classname, arg_removeCount };
+
+	char classname[256];
+	const char* value = getAmxString(amx, params[arg_classname], classname);
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_RemoveOther(value, args[arg_removeCount]);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_shared_random_long(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_seed, arg_low, arg_high };
+
+	CAmxArgs args(amx, params);
+	return g_ReGameFuncs->UTIL_SharedRandomLong(args[arg_seed], args[arg_low], args[arg_high]);
+}
+
+cell AMX_NATIVE_CALL rg_shared_random_float(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_seed, arg_low, arg_high };
+
+	CAmxArgs args(amx, params);
+	return g_ReGameFuncs->UTIL_SharedRandomFloat(args[arg_seed], args[arg_low], args[arg_high]);
+}
+
+cell AMX_NATIVE_CALL rg_set_group_trace(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_groupmask, arg_op };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_SetGroupTrace(args[arg_groupmask], args[arg_op]);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_unset_group_trace(AMX* amx, cell* params)
+{
+	enum args_e { arg_count };
+
+	g_ReGameFuncs->UTIL_UnsetGroupTrace();
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_find_entity_in_sphere(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_start_index, arg_vecCenter, arg_radius };
+
+	auto pStartEntity = getPrivate<CBaseEntity>(params[arg_start_index]);
+
+	CAmxArgs args(amx, params);
+	auto pEntity = g_ReGameFuncs->UTIL_FindEntityInSphere(pStartEntity, args[arg_vecCenter], args[arg_radius]);
+
+	if (pEntity) {
+		return indexOfEdict(pEntity->pev);
+	}
+
+	return 0;
+}
+
+cell AMX_NATIVE_CALL rg_screen_shake(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_center, arg_amplitude, arg_frequency, arg_duration, arg_radius };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_ScreenShake(args[arg_center], args[arg_amplitude], args[arg_frequency], args[arg_duration], args[arg_radius]);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_screen_fade_all(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_color, arg_fadeTime, arg_fadeHold, arg_alpha, arg_flags };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_ScreenFadeAll(args[arg_color], args[arg_fadeTime], args[arg_fadeHold], args[arg_alpha], args[arg_flags]);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_screen_fade(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_entity, arg_color, arg_fadeTime, arg_fadeHold, arg_alpha, arg_flags };
+
+	CBaseEntity* pEntity = getPrivate<CBaseEntity>(params[arg_entity]);
+	CHECK_CONNECTED(pEntity, arg_entity);
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_ScreenFade(args[arg_entity], args[arg_color], args[arg_fadeTime], args[arg_fadeHold], args[arg_alpha], args[arg_flags]);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_set_size(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_vecMin, arg_vecMax };
+
+	CHECK_ISENTITY(arg_index);
+
+	CBaseEntity* pEntity = getPrivate<CBaseEntity>(params[arg_index]);
+	if (unlikely(pEntity == nullptr)) {
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: invalid or uninitialized entity", __FUNCTION__);
+		return FALSE;
+	}
+
+	entvars_t* pevEntity = pEntity->pev;
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_SetSize(pevEntity, args[arg_vecMin], args[arg_vecMax]);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_set_origin(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_vecOrigin };
+
+	CHECK_ISENTITY(arg_index);
+
+	CBaseEntity* pEntity = getPrivate<CBaseEntity>(params[arg_index]);
+	if (unlikely(pEntity == nullptr)) {
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: invalid or uninitialized entity", __FUNCTION__);
+		return FALSE;
+	}
+
+	entvars_t* pevEntity = pEntity->pev;
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_SetOrigin(pevEntity, args[arg_vecOrigin]);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_point_contents(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_vec };
+
+	CAmxArgs args(amx, params);
+	return g_ReGameFuncs->UTIL_PointContents(args[arg_vec]);
+}
+
+cell AMX_NATIVE_CALL rg_water_level(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_position, arg_minz, arg_maxz };
+
+	CAmxArgs args(amx, params);
+	return g_ReGameFuncs->UTIL_WaterLevel(args[arg_position], args[arg_minz], args[arg_maxz]);
+}
+
+cell AMX_NATIVE_CALL rg_bubbles(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_mins, arg_maxs, arg_bubbleCount };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_Bubbles(args[arg_mins], args[arg_maxs], args[arg_bubbleCount]);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_bubble_trail(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_from, arg_to, arg_bubbleCount };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_BubbleTrail(args[arg_from], args[arg_to], args[arg_bubbleCount]);
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL rg_count_entities(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_classname };
+
+	char classname[256];
+	const char* value = getAmxString(amx, params[arg_classname], classname);
+
+	return g_ReGameFuncs->UTIL_CountEntities(value);
+}
+
+cell AMX_NATIVE_CALL rg_is_spawn_point_occupied(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_spot };
+
+	CHECK_ISENTITY(arg_spot);
+
+	CBaseEntity* pSpot = getPrivate<CBaseEntity>(params[arg_spot]);
+
+	return g_ReGameFuncs->UTIL_IsSpawnPointOccupied(pSpot);
+}
+
+
 AMX_NATIVE_INFO Misc_Natives_RG[] =
 {
 	{ "rg_set_animation",             rg_set_animation             },
@@ -3459,6 +3663,26 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_player_relationship",       rg_player_relationship       },
 
 	{ "rg_send_death_message",        rg_send_death_message        },
+
+	{ "rg_restart_other",             rg_restart_other             },
+	{ "rg_reset_entities",            rg_reset_entities            },
+	{ "rg_remove_other",              rg_remove_other              },
+	{ "rg_shared_random_long",        rg_shared_random_long        },
+	{ "rg_shared_random_float",       rg_shared_random_float       },
+	{ "rg_set_group_trace",           rg_set_group_trace           },
+	{ "rg_unset_group_trace",         rg_unset_group_trace         },
+	{ "rg_find_entity_in_sphere",     rg_find_entity_in_sphere     },
+	{ "rg_screen_shake",              rg_screen_shake              },
+	{ "rg_screen_fade_all",           rg_screen_fade_all           },
+	{ "rg_screen_fade",               rg_screen_fade               },
+	{ "rg_set_size",                  rg_set_size                  },
+	{ "rg_set_origin",                rg_set_origin                },
+	{ "rg_point_contents",            rg_point_contents            },
+	{ "rg_water_level",               rg_water_level               },
+	{ "rg_bubbles",                   rg_bubbles                   },
+	{ "rg_bubble_trail",              rg_bubble_trail              },
+	{ "rg_count_entities",            rg_count_entities            },
+	{ "rg_is_spawn_point_occupied",   rg_is_spawn_point_occupied   },
 
 	{ nullptr, nullptr }
 };
