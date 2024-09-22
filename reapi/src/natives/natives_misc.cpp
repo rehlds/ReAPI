@@ -3345,6 +3345,207 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 	return TRUE;
 }
 
+/*
+* Usually called whenever an entity gets attacked by a hitscan (such as a gun) weapon.
+*
+* @param index              Client index
+* @param attacker           Attacker index
+* @param flDamage           The amount of damage
+* @param vecDir             Direction
+* @param ptr                Traceresult pointer
+* @param bitsDamageType     Damage type DMG_*
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_player_traceattack(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_attacker, arg_damage, arg_dir, arg_trace, arg_dmg_type };
+
+	CHECK_ISPLAYER(arg_index);
+	CHECK_ISENTITY(arg_attacker);
+
+	CBasePlayer* pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	CAmxArgs args(amx, params);
+	pPlayer->TraceAttack(args[arg_attacker], args[arg_damage], args[arg_dir], args[arg_trace], args[arg_dmg_type]);
+	return TRUE;
+}
+
+/*
+* Usually called whenever an entity takes any kind of damage.
+*
+* @param index              Client index
+* @param inflictor          Inflictor index
+* @param attacker           Attacker index
+* @param flDamage           The amount of damage
+* @param bitsDamageType     Damage type DMG_*
+*
+* @return                   1 on success, 0 otherwise
+*/
+cell AMX_NATIVE_CALL rg_player_takedamage(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_inflictor, arg_attacker, arg_damage, arg_dmg_type };
+
+	CHECK_ISPLAYER(arg_index);
+	CHECK_ISENTITY(arg_inflictor);
+	CHECK_ISENTITY(arg_attacker);
+
+	CBasePlayer* pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	CAmxArgs args(amx, params);
+	return pPlayer->TakeDamage(args[arg_attacker], args[arg_inflictor], args[arg_damage], args[arg_dmg_type]);
+}
+
+/*
+* Usually called whenever an entity gets a form of a heal.
+*
+* @param index              Client index
+* @param flHealth           The amount of health
+* @param bitsDamageType     Damage type DMG_*
+*
+* @return                   1 on success, 0 otherwise
+*/
+cell AMX_NATIVE_CALL rg_player_takehealth(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_health, arg_dmg_type };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer* pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	CAmxArgs args(amx, params);
+	return pPlayer->TakeHealth(args[arg_health], args[arg_dmg_type]);
+}
+
+/*
+* Normally called whenever an entity dies.
+*
+* @param index              Client index
+* @param attacker           Attacker index
+* @param gib                Use DMG_NEVERGIB or DMG_ALWAYSGIB
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_player_killed(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_attacker, arg_gib };
+
+	CHECK_ISPLAYER(arg_index);
+	CHECK_ISENTITY(arg_attacker);
+
+	CBasePlayer* pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	CAmxArgs args(amx, params);
+	pPlayer->Killed(args[arg_attacker], args[arg_gib]);
+	return TRUE;
+}
+
+/*
+* Typically adds points to the entity.
+*
+* @param index              Client index
+* @param score              Adds the score to the current amount
+* @param allowNegativeScore Allow Negative Score
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_player_addpoints(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_score, arg_allow_negative_score };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer* pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	CAmxArgs args(amx, params);
+	pPlayer->AddPoints(args[arg_score], args[arg_allow_negative_score]);
+	return TRUE;
+}
+
+/*
+* This will never return true if a client is not connected. If you need
+* to know whether a client is alive, an additional call to is_user_connected() is unnecessary.
+*
+* @param index              Client index
+*
+* @return                   1 on success, 0 otherwise
+*/
+cell AMX_NATIVE_CALL rg_is_player_alive(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer* pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	return pPlayer->IsAlive();
+}
+
+/*
+* Whether or not the entity is a net client.
+*
+* @param index              Client index
+*
+* @return                   1 on success, 0 otherwise
+*/
+cell AMX_NATIVE_CALL rg_is_player_net_client(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer* pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	return pPlayer->IsNetClient();
+}
+
+/*
+* returns the position in vector the exact position of the weapon in which the player is located
+*
+* @param index              Client index
+*
+* @return Float:[3]         The source position
+*/
+cell AMX_NATIVE_CALL rg_get_player_gun_position(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_out };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer* pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	CAmxArgs args(amx, params);
+	args[arg_out].vector() = pPlayer->GetGunPosition();
+	return TRUE;
+}
+
+/*
+* Returns if the client is a bot.
+*
+* @param index              Client index
+*
+* @return                   1 on success, 0 otherwise
+*/
+cell AMX_NATIVE_CALL rg_is_player_bot(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer* pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	return pPlayer->IsBot();
+}
+
 AMX_NATIVE_INFO Misc_Natives_RG[] =
 {
 	{ "rg_set_animation",             rg_set_animation             },
@@ -3459,6 +3660,16 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_player_relationship",       rg_player_relationship       },
 
 	{ "rg_send_death_message",        rg_send_death_message        },
+
+	{ "rg_player_traceattack",        rg_player_traceattack        },
+	{ "rg_player_takedamage",         rg_player_takedamage         },
+	{ "rg_player_takehealth",         rg_player_takehealth         },
+	{ "rg_player_killed",             rg_player_killed             },
+	{ "rg_player_addpoints",          rg_player_addpoints          },
+	{ "rg_is_player_alive",           rg_is_player_alive           },
+	{ "rg_is_player_net_client",      rg_is_player_net_client      },
+	{ "rg_get_player_gun_position",   rg_get_player_gun_position   },
+	{ "rg_is_player_bot",             rg_is_player_bot             },
 
 	{ nullptr, nullptr }
 };
