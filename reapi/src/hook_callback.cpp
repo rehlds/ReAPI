@@ -1766,6 +1766,28 @@ void CSGameRules_SendDeathMessage(IReGameHook_CSGameRules_SendDeathMessage *chai
 	callVoidForward(RG_CSGameRules_SendDeathMessage, original, indexOfPDataAmx(pKiller), indexOfEdict(pVictim->pev), indexOfPDataAmx(pAssister), indexOfEdictAmx(pevInflictor), killerWeaponName, iDeathMessageFlags, iRarityOfKill);
 }
 
+void CBasePlayerItem_Materialize(IReGameHook_CBasePlayerItem_Materialize *chain, CBasePlayerItem *pthis)
+{
+	auto original = [chain](int _pthis)
+		{
+			chain->callNext(getPrivate<CBasePlayerItem>(_pthis));
+		};
+
+	callVoidForward(RG_CBasePlayerItem_Materialize, original, indexOfEdict(pthis->pev));
+}
+
+
+void CBasePlayerItem_CheckRespawn(IReGameHook_CBasePlayerItem_CheckRespawn *chain, CBasePlayerItem *pthis)
+{
+	auto original = [chain](int _pthis)
+		{
+			chain->callNext(getPrivate<CBasePlayerItem>(_pthis));
+		};
+
+	callVoidForward(RG_CBasePlayerItem_CheckRespawn, original, indexOfEdict(pthis->pev));
+}
+
+
 /*
 * VTC functions
 */

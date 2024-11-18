@@ -26,7 +26,8 @@ enum hooks_tables_e
 	ht_weapon,
 	ht_gib,
 	ht_cbaseentity,
-	ht_botmanager
+	ht_botmanager,
+	ht_cbaseplayeritem
 };
 
 enum members_tables_e
