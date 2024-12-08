@@ -1260,6 +1260,41 @@ enum GamedllFunc_CSGameRules
 	* Params:           (const pKiller, const pVictim, const pAssister, const pevInflictor, const killerWeaponName[], const DeathMessageFlags:iDeathMessageFlags, const KillRarity:iRarityOfKill)
 	*/
 	RG_CSGameRules_SendDeathMessage,
+
+	/*
+	* Description:      Called when the game over condition is being checked.
+	* Return type:      bool
+	* Params:           ()
+	*/
+	RG_CSGameRules_CheckGameOver,
+
+	/*
+	* Description:      Called when the time limit condition is being checked.
+	* Return type:      bool
+	* Params:           ()
+	*/
+	RG_CSGameRules_CheckTimeLimit,
+
+	/*
+	* Description:      Called when the frag limit condition is being checked.
+	* Return type:      bool
+	* Params:           ()
+	*/
+	RG_CSGameRules_CheckFragLimit,
+
+	/*
+	* Description:      Called when the max rounds condition is being checked.
+	* Return type:      bool
+	* Params:           ()
+	*/
+	RG_CSGameRules_CheckMaxRounds,
+
+	/*
+	* Description:      Called when the win limit condition is being checked.
+	* Return type:      bool
+	* Params:           ()
+	*/
+	RG_CSGameRules_CheckWinLimit,
 };
 
 /**
