@@ -3243,6 +3243,34 @@ cell AMX_NATIVE_CALL rg_set_observer_mode(AMX* amx, cell* params)
 }
 
 /*
+* Call origin function CBasePlayer::Observer_FindNextPlayer()
+* @note Player must be a valid observer (m_afPhysicsFlags & PFLAG_OBSERVER).
+*
+* @param player                Player index.
+* @param bReverse              If bReverse is true, finding order will be reversed
+* @param name                  Player name to find.
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_observer_find_next_player(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_bReverse, arg_name };
+
+	CHECK_ISPLAYER(arg_index)
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	char nameBuf[MAX_PLAYER_NAME_LENGTH];
+	const char* name = getAmxString(amx, params[arg_name], nameBuf);
+	if (strcmp(name, "") == 0)
+		name = nullptr;
+
+	pPlayer->CSPlayer()->Observer_FindNextPlayer(params[arg_bReverse] != 0, name);
+	return TRUE;
+}
+
+/*
 * Emits a death notice (logs, DeathMsg event, win conditions check)
 *
 * @param pVictim               Player index.
@@ -3455,6 +3483,7 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_switch_best_weapon",        rg_switch_best_weapon        },
 	{ "rg_disappear",                 rg_disappear                 },
 	{ "rg_set_observer_mode",         rg_set_observer_mode         },
+	{ "rg_observer_find_next_player", rg_observer_find_next_player },
 	{ "rg_death_notice",              rg_death_notice              },
 	{ "rg_player_relationship",       rg_player_relationship       },
 
