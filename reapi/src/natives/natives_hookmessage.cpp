@@ -188,7 +188,7 @@ cell AMX_NATIVE_CALL SetMessageData(AMX *amx, cell *params)
 			break;
 		case IMessage::ParamType::Angle:
 		case IMessage::ParamType::Coord:
-			g_activeMessageContext->setParamFloat(number, *(float *)value);
+			g_activeMessageContext->setParamFloat(number, amx_CellToFloat(*value));
 			break;
 		case IMessage::ParamType::Byte:
 		case IMessage::ParamType::Char:
@@ -266,10 +266,11 @@ cell AMX_NATIVE_CALL GetMessageData(AMX *amx, cell *params)
 		case IMessage::ParamType::Angle:
 		case IMessage::ParamType::Coord:
 		{
-			float flValue = g_activeMessageContext->getParamFloat(number);
+			cell value = amx_FloatToCell(g_activeMessageContext->getParamFloat(number));
 			if (PARAMS_COUNT > 2)
-				*dstAddr = flValue;
-			return flValue;
+				*dstAddr = value;
+
+			return value;
 		}
 		case IMessage::ParamType::Entity:
 		case IMessage::ParamType::Byte:
@@ -346,10 +347,10 @@ cell AMX_NATIVE_CALL GetMessageOrigData(AMX *amx, cell *params)
 		case IMessage::ParamType::Angle:
 		case IMessage::ParamType::Coord:
 		{
-			float flValue = g_activeMessageContext->getOriginalParamFloat(number);
+			cell value = amx_FloatToCell(g_activeMessageContext->getOriginalParamFloat(number));
 			if (PARAMS_COUNT > 2)
-				*dstAddr = flValue;
-			return flValue;
+				*dstAddr = value;
+			return value;
 		}
 		case IMessage::ParamType::Entity:
 		case IMessage::ParamType::Byte:
