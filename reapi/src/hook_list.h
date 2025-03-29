@@ -308,6 +308,11 @@ enum GamedllFunc_CSGameRules
 	RG_CSGameRules_TeamStacked,
 	RG_CSGameRules_PlayerGotWeapon,
 	RG_CSGameRules_SendDeathMessage,
+	RG_CSGameRules_CheckGameOver,
+	RG_CSGameRules_CheckTimeLimit,
+	RG_CSGameRules_CheckFragLimit,
+	RG_CSGameRules_CheckMaxRounds,
+	RG_CSGameRules_CheckWinLimit,
 
 	// [...]
 };

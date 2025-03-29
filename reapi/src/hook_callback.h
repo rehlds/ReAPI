@@ -575,6 +575,12 @@ void CBasePlayer_Observer_Think(IReGameHook_CBasePlayer_Observer_Think *chain, C
 void CBasePlayer_RemoveAllItems(IReGameHook_CBasePlayer_RemoveAllItems *chain, CBasePlayer *pthis, BOOL removeSuit);
 void CSGameRules_SendDeathMessage(IReGameHook_CSGameRules_SendDeathMessage *chain, CBaseEntity *pKiller, CBasePlayer *pVictim, CBasePlayer *pAssister, entvars_t *pevInflictor, const char *killerWeaponName, int iDeathMessageFlags, int iRarityOfKill);
 
+BOOL CSGameRules_CheckGameOver(IReGameHook_CSGameRules_CheckGameOver *chain);
+BOOL CSGameRules_CheckTimeLimit(IReGameHook_CSGameRules_CheckTimeLimit *chain);
+BOOL CSGameRules_CheckFragLimit(IReGameHook_CSGameRules_CheckFragLimit *chain);
+BOOL CSGameRules_CheckMaxRounds(IReGameHook_CSGameRules_CheckMaxRounds *chain);
+BOOL CSGameRules_CheckWinLimit(IReGameHook_CSGameRules_CheckWinLimit *chain);
+
 /*
 * VTC functions
 */

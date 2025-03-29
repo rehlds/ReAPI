@@ -1766,6 +1766,56 @@ void CSGameRules_SendDeathMessage(IReGameHook_CSGameRules_SendDeathMessage *chai
 	callVoidForward(RG_CSGameRules_SendDeathMessage, original, indexOfPDataAmx(pKiller), indexOfEdict(pVictim->pev), indexOfPDataAmx(pAssister), indexOfEdictAmx(pevInflictor), killerWeaponName, iDeathMessageFlags, iRarityOfKill);
 }
 
+BOOL CSGameRules_CheckGameOver(IReGameHook_CSGameRules_CheckGameOver *chain)
+{
+	auto original = [chain]()
+	{
+		return chain->callNext();
+	};
+
+	return callForward<BOOL>(RG_CSGameRules_CheckGameOver, original);
+}
+
+BOOL CSGameRules_CheckTimeLimit(IReGameHook_CSGameRules_CheckTimeLimit *chain)
+{
+	auto original = [chain]()
+	{
+		return chain->callNext();
+	};
+
+	return callForward<BOOL>(RG_CSGameRules_CheckTimeLimit, original);
+}
+
+BOOL CSGameRules_CheckFragLimit(IReGameHook_CSGameRules_CheckFragLimit *chain)
+{
+	auto original = [chain]()
+	{
+		return chain->callNext();
+	};
+
+	return callForward<BOOL>(RG_CSGameRules_CheckFragLimit, original);
+}
+
+BOOL CSGameRules_CheckMaxRounds(IReGameHook_CSGameRules_CheckMaxRounds *chain)
+{
+	auto original = [chain]()
+	{
+		return chain->callNext();
+	};
+
+	return callForward<BOOL>(RG_CSGameRules_CheckMaxRounds, original);
+}
+
+BOOL CSGameRules_CheckWinLimit(IReGameHook_CSGameRules_CheckWinLimit *chain)
+{
+	auto original = [chain]()
+	{
+		return chain->callNext();
+	};
+
+	return callForward<BOOL>(RG_CSGameRules_CheckWinLimit, original);
+}
+
 /*
 * VTC functions
 */
