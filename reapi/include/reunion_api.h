@@ -34,6 +34,10 @@ enum reu_authkey_kind
 class IReunionApi
 {
 public:
+	// NOTE: GetMajorVersion, GetMinorVersion have been since version 0.1.0.92c
+	int version_major;
+	int version_minor;
+
 	enum
 	{
 		LONG_AUTHID_LEN = 16
