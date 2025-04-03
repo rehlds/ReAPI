@@ -39,6 +39,7 @@ extern hook_t hooklist_weapon[];
 extern hook_t hooklist_gib[];
 extern hook_t hooklist_cbaseentity[];
 extern hook_t hooklist_botmanager[];
+extern hook_t hooklist_cbaseplayeritem[];
 
 enum
 {
@@ -67,6 +68,7 @@ struct hooklist_t
 			CASE(gib)
 			CASE(cbaseentity)
 			CASE(botmanager)
+			CASE(cbaseplayeritem)
 		}
 
 		#undef CASE
@@ -91,6 +93,7 @@ struct hooklist_t
 		ht_gib,
 		ht_cbaseentity,
 		ht_botmanager,
+		ht_cbaseplayeritem,
 	};
 };
 
@@ -342,6 +345,15 @@ enum ReCheckerFunc
 	RC_FileConsistencyProcess = BEGIN_FUNC_REGION(rechecker),
 	RC_FileConsistencyFinal,
 	RC_CmdExec,
+
+	// [...]
+};
+
+
+enum GamedllFunc_CBasePlayerItem
+{
+	RG_CBasePlayerItem_Materialize = BEGIN_FUNC_REGION(cbaseplayeritem),
+	RG_CBasePlayerItem_CheckRespawn,
 
 	// [...]
 };

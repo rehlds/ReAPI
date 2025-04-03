@@ -216,6 +216,7 @@ hook_t hooklist_player[] = {
 	DLL(CBasePlayer_PlayerDeathThink),
 	DLL(CBasePlayer_Observer_Think),
 	DLL(CBasePlayer_RemoveAllItems),
+
 };
 
 hook_t hooklist_gamerules[] = {
@@ -289,6 +290,14 @@ hook_t hooklist_botmanager[] = {
 	DLL(CBotManager_OnEvent),
 };
 
+hook_t hooklist_cbaseplayeritem[] = {
+	DLL(CBasePlayerItem_Materialize),
+	DLL(CBasePlayerItem_CheckRespawn),
+};
+
+
+
+
 #define RCHECK(h,...) { {}, {}, #h, "ReChecker", [](){ return api_cfg.hasRechecker(); }, ((!(RC_##h & (MAX_REGION_RANGE - 1)) ? regfunc::current_cell = 1, true : false) || (RC_##h & (MAX_REGION_RANGE - 1)) == regfunc::current_cell++) ? regfunc(h##__VA_ARGS__) : regfunc(#h#__VA_ARGS__), [](){ g_RecheckerHookchains->h()->registerHook(&h); }, [](){ g_RecheckerHookchains->h()->unregisterHook(&h); }, false}
 hook_t hooklist_rechecker[] = {
 	RCHECK(FileConsistencyProcess, _AMXX),
@@ -316,6 +325,7 @@ hook_t* hooklist_t::getHookSafe(size_t hook)
 		CASE(gib)
 		CASE(cbaseentity)
 		CASE(botmanager)
+		CASE(cbaseplayeritem)
 	}
 
 	return nullptr;
@@ -337,6 +347,7 @@ void hooklist_t::clear()
 	FOREACH_CLEAR(gib);
 	FOREACH_CLEAR(cbaseentity);
 	FOREACH_CLEAR(botmanager);
+	FOREACH_CLEAR(cbaseplayeritem);
 }
 
 void hook_t::clear()

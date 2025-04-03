@@ -943,6 +943,24 @@ enum GamedllFunc_CBasePlayer
 };
 
 /**
+* GamedllFunc CBasePlayerItem
+*/
+enum GamedllFunc_CBasePlayerItem
+{
+	/*
+	* Description:      -
+	* Params:           (const this)
+	*/
+	RG_CBasePlayerItem_Materialize = BEGIN_FUNC_REGION(cbaseplayeritem),
+
+	/*
+	* Description:      -
+	* Params:           (const this)
+	*/
+	RG_CBasePlayerItem_CheckRespawn,
+}
+
+/**
 * GamedllFunc CBasePlayer
 */
 enum GamedllFunc_CBasePlayerWeapon
