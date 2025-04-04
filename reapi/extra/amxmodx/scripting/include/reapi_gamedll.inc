@@ -1221,3 +1221,100 @@ native rg_player_relationship(const player, const target);
 * @noreturn
 */
 native rg_send_death_message(const pKiller, const pVictim, const pAssister, const pevInflictor, const killerWeaponName[], const DeathMessageFlags:iDeathMessageFlags, const KillRarity:iRarityOfKill);
+
+/*
+* Usually called whenever an entity gets attacked by a hitscan (such as a gun) weapon.
+*
+* @param index              Client index
+* @param attacker           Attacker index
+* @param flDamage           The amount of damage
+* @param vecDir             Direction
+* @param ptr                Traceresult pointer
+* @param bitsDamageType     Damage type DMG_*
+*
+* @noreturn
+*/
+native rg_player_traceattack(const index, const attacker, const Float:flDamage, Float:vecDir[3], const ptr, const bitsDamageType);
+
+/*
+* Usually called whenever an entity takes any kind of damage.
+*
+* @param index              Client index
+* @param inflictor          Inflictor index
+* @param attacker           Attacker index
+* @param flDamage           The amount of damage
+* @param bitsDamageType     Damage type DMG_*
+*
+* @return                   1 on success, 0 otherwise
+*/
+native rg_player_takedamage(const index, const inflictor, const attacker, const Float:flDamage, const bitsDamageType);
+
+/*
+* Usually called whenever an entity gets a form of a heal.
+*
+* @param index              Client index
+* @param flHealth           The amount of health
+* @param bitsDamageType     Damage type DMG_*
+*
+* @return                   1 on success, 0 otherwise
+*/
+native rg_player_takehealth(const index, const Float:flHealth, const bitsDamageType);
+
+/*
+* Normally called whenever an entity dies.
+*
+* @param index              Client index
+* @param attacker           Attacker index
+* @param gib                Use DMG_NEVERGIB or DMG_ALWAYSGIB
+*
+* @noreturn
+*/
+native rg_player_killed(const index, const attacker, const gib);
+
+/*
+* Typically adds points to the entity.
+*
+* @param index              Client index
+* @param score              Adds the score to the current amount
+* @param allowNegativeScore Allow Negative Score
+*
+* @noreturn
+*/
+native rg_player_addpoints(const index, const score, const bool:allowNegativeScore);
+
+/*
+* This will never return true if a client is not connected. If you need
+* to know whether a client is alive, an additional call to is_user_connected() is unnecessary.
+*
+* @param index              Client index
+*
+* @return                   1 on success, 0 otherwise
+*/
+native rg_is_player_alive(const index);
+
+/*
+* Whether or not the entity is a net client.
+*
+* @param index              Client index
+*
+* @return                   1 on success, 0 otherwise
+*/
+native rg_is_player_net_client(const index);
+
+/*
+* returns the position in vector the exact position of the weapon in which the player is located
+*
+* @param index              Client index
+*
+* @return Float:[3]         The source position
+*/
+native Float:[3] rg_get_player_gun_position(const index);
+
+/*
+* Returns if the client is a bot.
+*
+* @param index              Client index
+*
+* @return                   1 on success, 0 otherwise
+*/
+native rg_is_player_bot(const index);
