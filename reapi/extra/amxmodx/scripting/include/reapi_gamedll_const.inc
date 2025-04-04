@@ -940,6 +940,12 @@ enum GamedllFunc_CBasePlayer
 	* Params:           (const this, bool:removeSuit)
 	*/
 	RG_CBasePlayer_RemoveAllItems,
+
+	/*
+	* Description:      -
+	* Params:           (const this)
+	*/
+	RG_CBasePlayer_UpdateStatusBar,
 };
 
 /**
