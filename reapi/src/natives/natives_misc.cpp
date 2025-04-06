@@ -2076,16 +2076,18 @@ cell AMX_NATIVE_CALL rg_send_bartime2(AMX *amx, cell *params)
 	CHECK_CONNECTED(pPlayer, arg_index);
 
 	CAmxArgs args(amx, params);
+	int duration = args[arg_time];
 	float startPercent = args[arg_start_percent];
 	if (!args[arg_observer]) {
 		EMESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgBarTime2, nullptr, pPlayer->edict());
-			EWRITE_SHORT(args[arg_time]);
+			EWRITE_SHORT(duration);
 			EWRITE_SHORT(startPercent);
 		EMESSAGE_END();
 		return TRUE;
 	}
 
-	pPlayer->CSPlayer()->SetProgressBarTime2(args[arg_time], startPercent);
+	float timeElapsed = (startPercent / 100.0f) * duration;
+	pPlayer->CSPlayer()->SetProgressBarTime2(duration, timeElapsed);
 	return TRUE;
 }
 
