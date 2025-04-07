@@ -300,6 +300,24 @@ native bool:rh_is_entity_fullpacked(const host, const entity, const frame = -1);
 */
 native Float:rh_get_realtime();
 
+/*
+* Checks if server paused
+*
+* @return           Returns true if paused, otherwise false.
+*
+*/
+native bool:rh_is_paused();
+
+/*
+* Set server pause state
+*
+* @param status    pause state
+*
+* @noreturn
+*
+*/
+native rh_set_paused(const bool:status);
+
 enum MessageHook
 {
 	INVALID_MESSAGEHOOK = 0

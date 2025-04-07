@@ -3761,6 +3761,34 @@ cell AMX_NATIVE_CALL rh_is_entity_fullpacked(AMX *amx, cell *params)
 	return FALSE;
 }
 
+/*
+* Checks if server paused
+*
+* @return           Returns true if paused, otherwise false.
+*
+* native bool:rh_is_paused();
+*/
+cell AMX_NATIVE_CALL rh_is_paused(AMX *amx, cell *params)
+{
+	return g_RehldsData->IsPaused() ? TRUE : FALSE;
+}
+
+/*
+* Set server pause state
+*
+* @param st    pause state
+*
+* @noreturn
+*
+* native rh_set_pause(const bool:status);
+*/
+cell AMX_NATIVE_CALL rh_set_pause(AMX *amx, cell *params)
+{
+	enum { arg_count, arg_status };
+	g_RehldsFuncs->SetServerPause(params[arg_status] != 0);
+	return TRUE;
+}
+
 AMX_NATIVE_INFO Misc_Natives_RH[] =
 {
 	{ "rh_set_mapname",             rh_set_mapname             },
@@ -3773,6 +3801,8 @@ AMX_NATIVE_INFO Misc_Natives_RH[] =
 	{ "rh_get_realtime",            rh_get_realtime            },
 	{ "rh_is_entity_fullpacked",    rh_is_entity_fullpacked    },
 	{ "rh_get_client_connect_time", rh_get_client_connect_time },
+	{ "rh_is_paused",               rh_is_paused               },
+	{ "rh_set_pause",               rh_set_pause               },
 
 	{ nullptr, nullptr }
 };
