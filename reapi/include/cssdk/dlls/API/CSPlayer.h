@@ -118,6 +118,7 @@ public:
 	virtual void Reset() = 0;
 	virtual void OnSpawnEquip(bool addDefault = true, bool equipGame = true) = 0;
 	virtual void SetScoreboardAttributes(CBasePlayer *destination = nullptr) = 0;
+	virtual void Observer_FindNextPlayer(bool bReverse, const char *name = nullptr) = 0;
 
 	CBasePlayer *BasePlayer() const;
 
