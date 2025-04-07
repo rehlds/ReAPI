@@ -1186,6 +1186,18 @@ native rg_disappear(const player);
 native rg_set_observer_mode(const player, const mode);
 
 /*
+* Call origin function CBasePlayer::Observer_FindNextPlayer()
+* @note Player must be a valid observer (m_afPhysicsFlags & PFLAG_OBSERVER).
+*
+* @param player                Player index.
+* @param bReverse              If bReverse is true, finding order will be reversed
+* @param name                  Player name to find.
+*
+* @noreturn
+*/
+native rg_observer_find_next_player(const player, const bool:bReverse = false, const name[] = "");
+
+/*
 * Emits a death notice (logs, DeathMsg event, win conditions check)
 *
 * @param pVictim               Player index.
