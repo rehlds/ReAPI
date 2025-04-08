@@ -306,7 +306,7 @@ native Float:rh_get_realtime();
 * @return           Returns true if paused, otherwise false.
 *
 */
-native bool:rh_is_paused();
+native bool:rh_is_server_paused();
 
 /*
 * Set server pause state
@@ -316,7 +316,7 @@ native bool:rh_is_paused();
 * @noreturn
 *
 */
-native rh_set_paused(const bool:status);
+native rh_set_server_pause(const bool:status);
 
 enum MessageHook
 {
