@@ -1776,6 +1776,16 @@ void CBasePlayer_UpdateStatusBar(IReGameHook_CBasePlayer_UpdateStatusBar *chain,
 	callVoidForward(RG_CBasePlayer_UpdateStatusBar, original, indexOfEdict(pthis->pev));
 }
 
+void CBasePlayer_Knockback(IReGameHook_CBasePlayer_Knockback *chain, CBasePlayer *pthis, CBaseEntity *pAttacker, float flModifier)
+{
+	auto original = [chain](int _pthis, int _pAttacker, float _flModifier)
+	{
+		chain->callNext(getPrivate<CBasePlayer>(_pthis), getPrivate<CBaseEntity>(_pAttacker), _flModifier);
+	};
+
+	callVoidForward(RG_CBasePlayer_Knockback, original, indexOfEdict(pthis->pev), indexOfEdict(pAttacker->pev), flModifier);
+}
+
 /*
 * VTC functions
 */
