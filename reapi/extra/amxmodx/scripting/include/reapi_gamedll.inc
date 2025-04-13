@@ -1233,3 +1233,14 @@ native rg_player_relationship(const player, const target);
 * @noreturn
 */
 native rg_send_death_message(const pKiller, const pVictim, const pAssister, const pevInflictor, const killerWeaponName[], const DeathMessageFlags:iDeathMessageFlags, const KillRarity:iRarityOfKill);
+
+/*
+* Adds knockback to the victim.
+*
+* @param pVictim                Victim index.
+* @param pAttacker              Attacker index.
+* @param flModifier             Modifier amount.
+*
+* @noreturn
+*/
+native rg_player_knockback(const pVictim, const pAttacker, const Float:flModifier);
