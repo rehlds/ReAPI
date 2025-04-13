@@ -3397,7 +3397,7 @@ cell AMX_NATIVE_CALL rg_player_knockback(AMX* amx, cell* params)
 	CBaseEntity *pAttacker = getPrivate<CBaseEntity>(params[arg_attacker]);
 
 	CAmxArgs args(amx, params);
-	pPlayer->Knockback(pAttacker, args[arg_modifier]);
+	pPlayer->CSPlayer()->Knockback(pAttacker, args[arg_modifier]);
 
 	return TRUE;
 }
