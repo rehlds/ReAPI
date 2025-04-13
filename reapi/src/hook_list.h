@@ -241,6 +241,7 @@ enum GamedllFunc_CBasePlayer
 	RG_CBasePlayer_Observer_Think,
 	RG_CBasePlayer_RemoveAllItems,
 	RG_CBasePlayer_UpdateStatusBar,
+	RG_CBasePlayer_Knockback,
 
 	// [...]
 };
