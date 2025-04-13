@@ -3375,6 +3375,33 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 	return TRUE;
 }
 
+/*
+* Adds knockback to the victim.
+*
+* @param pVictim                Victim index.
+* @param pAttacker              Attacker index.
+* @param flModifier             Modifier amount.
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_player_knockback(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_victim, arg_attacker, arg_modifier };
+
+	CHECK_ISPLAYER(arg_victim);
+	CHECK_ISENTITY(arg_attacker);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_victim]);
+	CHECK_CONNECTED(pPlayer, arg_victim);
+
+	CBaseEntity *pAttacker = getPrivate<CBaseEntity>(params[arg_attacker]);
+
+	CAmxArgs args(amx, params);
+	pPlayer->Knockback(pAttacker, args[arg_modifier]);
+
+	return TRUE;
+}
+
 AMX_NATIVE_INFO Misc_Natives_RG[] =
 {
 	{ "rg_set_animation",             rg_set_animation             },
@@ -3490,6 +3517,7 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_player_relationship",       rg_player_relationship       },
 
 	{ "rg_send_death_message",        rg_send_death_message        },
+	{ "rg_player_knockback",          rg_player_knockback          },
 
 	{ nullptr, nullptr }
 };
