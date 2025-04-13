@@ -946,6 +946,12 @@ enum GamedllFunc_CBasePlayer
 	* Params:           (const this)
 	*/
 	RG_CBasePlayer_UpdateStatusBar,
+
+	/*
+	* Description:      -
+	* Params:           (const this, pevAttacker, Float:flModifier)
+	*/
+	RG_CBasePlayer_Knockback,
 };
 
 /**
