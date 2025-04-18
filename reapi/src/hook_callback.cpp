@@ -1776,14 +1776,14 @@ void CBasePlayer_UpdateStatusBar(IReGameHook_CBasePlayer_UpdateStatusBar *chain,
 	callVoidForward(RG_CBasePlayer_UpdateStatusBar, original, indexOfEdict(pthis->pev));
 }
 
-void CBasePlayer_Knockback(IReGameHook_CBasePlayer_Knockback *chain, CBasePlayer *pthis, CBaseEntity *pAttacker, float flModifier)
+void CBasePlayer_TakeDamageImpulse(IReGameHook_CBasePlayer_TakeDamageImpulse *chain, CBasePlayer *pthis, CBasePlayer *pAttacker, float flKnockbackFactor, float flVelModifier)
 {
-	auto original = [chain](int _pthis, int _pAttacker, float _flModifier)
+	auto original = [chain](int _pthis, int _pAttacker, float _flKnockbackFactor, float _flVelModifier)
 	{
-		chain->callNext(getPrivate<CBasePlayer>(_pthis), getPrivate<CBaseEntity>(_pAttacker), _flModifier);
+		chain->callNext(getPrivate<CBasePlayer>(_pthis), getPrivate<CBasePlayer>(_pAttacker), _flKnockbackFactor, _flVelModifier);
 	};
 
-	callVoidForward(RG_CBasePlayer_Knockback, original, indexOfEdict(pthis->pev), indexOfEdict(pAttacker->pev), flModifier);
+	callVoidForward(RG_CBasePlayer_TakeDamageImpulse, original, indexOfEdict(pthis->pev), indexOfEdict(pAttacker->pev), flKnockbackFactor, flVelModifier);
 }
 
 /*

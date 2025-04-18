@@ -1235,12 +1235,13 @@ native rg_player_relationship(const player, const target);
 native rg_send_death_message(const pKiller, const pVictim, const pAssister, const pevInflictor, const killerWeaponName[], const DeathMessageFlags:iDeathMessageFlags, const KillRarity:iRarityOfKill);
 
 /*
-* Adds knockback to the victim.
+* Adds impulse to the player.
 *
-* @param pVictim                Victim index.
-* @param pAttacker              Attacker index.
-* @param flModifier             Modifier amount.
+* @param player                 Player index.
+* @param attacker               Attacker index.
+* @param flKnockbackFactor      Knockback factor.
+* @param flVelModifier          Velocity Modifier.
 *
 * @noreturn
 */
-native rg_player_knockback(const pVictim, const pAttacker, const Float:flModifier);
+native rg_player_takedamage_impulse(const player, const attacker, const Float:flKnockbackFactor, const Float:flVelModifier);

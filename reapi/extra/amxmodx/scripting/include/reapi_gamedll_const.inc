@@ -949,9 +949,9 @@ enum GamedllFunc_CBasePlayer
 
 	/*
 	* Description:      -
-	* Params:           (const this, pevAttacker, Float:flModifier)
+	* Params:           (const this, attacker, Float:flKnockbackFactor, Float:flVelModifier)
 	*/
-	RG_CBasePlayer_Knockback,
+	RG_CBasePlayer_TakeDamageImpulse,
 };
 
 /**

@@ -3376,28 +3376,42 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 }
 
 /*
-* Adds knockback to the victim.
+* Adds impulse to the player.
 *
-* @param pVictim                Victim index.
-* @param pAttacker              Attacker index.
-* @param flModifier             Modifier amount.
+* @param player                 Player index.
+* @param attacker               Attacker index.
+* @param flKnockbackFactor      Knockback factor.
+* @param flVelModifier          Velocity Modifier.
 *
 * @noreturn
 */
-cell AMX_NATIVE_CALL rg_player_knockback(AMX* amx, cell* params)
+cell AMX_NATIVE_CALL rg_player_takedamage_impulse(AMX *amx, cell *params)
 {
-	enum args_e { arg_count, arg_victim, arg_attacker, arg_modifier };
+	enum args_e { arg_count, arg_index, arg_attacker, arg_knockback_factor, arg_vel_modifier };
 
-	CHECK_ISPLAYER(arg_victim);
-	CHECK_ISENTITY(arg_attacker);
+	CHECK_ISPLAYER(arg_index);
+	CHECK_ISPLAYER(arg_attacker);
 
-	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_victim]);
-	CHECK_CONNECTED(pPlayer, arg_victim);
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
 
-	CBaseEntity *pAttacker = getPrivate<CBaseEntity>(params[arg_attacker]);
+	if (!pPlayer->IsAlive())
+	{
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: player %d not alive", __FUNCTION__, params[arg_index]);
+		return FALSE;
+	}
+
+	CBasePlayer *pAttacker = UTIL_PlayerByIndex(params[arg_attacker]);
+	CHECK_CONNECTED(pAttacker, arg_attacker);
+
+	if (!pAttacker->IsAlive())
+	{
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: attacker %d not alive", __FUNCTION__, params[arg_attacker]);
+		return FALSE;
+	}
 
 	CAmxArgs args(amx, params);
-	pPlayer->CSPlayer()->Knockback(pAttacker, args[arg_modifier]);
+	pPlayer->CSPlayer()->TakeDamageImpulse(pAttacker, args[arg_knockback_factor], args[arg_vel_modifier]);
 
 	return TRUE;
 }
@@ -3517,7 +3531,7 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_player_relationship",       rg_player_relationship       },
 
 	{ "rg_send_death_message",        rg_send_death_message        },
-	{ "rg_player_knockback",          rg_player_knockback          },
+	{ "rg_player_takedamage_impulse", rg_player_takedamage_impulse },
 
 	{ nullptr, nullptr }
 };
