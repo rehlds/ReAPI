@@ -3375,6 +3375,47 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 	return TRUE;
 }
 
+/*
+* Adds impulse to the player.
+*
+* @param player                 Player index.
+* @param attacker               Attacker index.
+* @param flKnockbackForce       Knockback force.
+* @param flVelModifier          Velocity modifier.
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_player_takedamage_impulse(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_attacker, arg_knockback_force, arg_vel_modifier };
+
+	CHECK_ISPLAYER(arg_index);
+	CHECK_ISPLAYER(arg_attacker);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	if (!pPlayer->IsAlive())
+	{
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: player %d not alive", __FUNCTION__, params[arg_index]);
+		return FALSE;
+	}
+
+	CBasePlayer *pAttacker = UTIL_PlayerByIndex(params[arg_attacker]);
+	CHECK_CONNECTED(pAttacker, arg_attacker);
+
+	if (!pAttacker->IsAlive())
+	{
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: attacker %d not alive", __FUNCTION__, params[arg_attacker]);
+		return FALSE;
+	}
+
+	CAmxArgs args(amx, params);
+	pPlayer->CSPlayer()->TakeDamageImpulse(pAttacker, args[arg_knockback_force], args[arg_vel_modifier]);
+
+	return TRUE;
+}
+
 AMX_NATIVE_INFO Misc_Natives_RG[] =
 {
 	{ "rg_set_animation",             rg_set_animation             },
@@ -3490,6 +3531,7 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_player_relationship",       rg_player_relationship       },
 
 	{ "rg_send_death_message",        rg_send_death_message        },
+	{ "rg_player_takedamage_impulse", rg_player_takedamage_impulse },
 
 	{ nullptr, nullptr }
 };
