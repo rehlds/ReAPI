@@ -3380,14 +3380,14 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 *
 * @param player                 Player index.
 * @param attacker               Attacker index.
-* @param flKnockbackFactor      Knockback factor.
-* @param flVelModifier          Velocity Modifier.
+* @param flKnockbackForce       Knockback force.
+* @param flVelModifier          Velocity modifier.
 *
 * @noreturn
 */
 cell AMX_NATIVE_CALL rg_player_takedamage_impulse(AMX *amx, cell *params)
 {
-	enum args_e { arg_count, arg_index, arg_attacker, arg_knockback_factor, arg_vel_modifier };
+	enum args_e { arg_count, arg_index, arg_attacker, arg_knockback_force, arg_vel_modifier };
 
 	CHECK_ISPLAYER(arg_index);
 	CHECK_ISPLAYER(arg_attacker);
@@ -3411,7 +3411,7 @@ cell AMX_NATIVE_CALL rg_player_takedamage_impulse(AMX *amx, cell *params)
 	}
 
 	CAmxArgs args(amx, params);
-	pPlayer->CSPlayer()->TakeDamageImpulse(pAttacker, args[arg_knockback_factor], args[arg_vel_modifier]);
+	pPlayer->CSPlayer()->TakeDamageImpulse(pAttacker, args[arg_knockback_force], args[arg_vel_modifier]);
 
 	return TRUE;
 }

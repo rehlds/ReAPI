@@ -1239,9 +1239,9 @@ native rg_send_death_message(const pKiller, const pVictim, const pAssister, cons
 *
 * @param player                 Player index.
 * @param attacker               Attacker index.
-* @param flKnockbackFactor      Knockback factor.
-* @param flVelModifier          Velocity Modifier.
+* @param flKnockbackForce       Knockback force.
+* @param flVelModifier          Velocity modifier.
 *
 * @noreturn
 */
-native rg_player_takedamage_impulse(const player, const attacker, const Float:flKnockbackFactor, const Float:flVelModifier);
+native rg_player_takedamage_impulse(const player, const attacker, const Float:flKnockbackForce, const Float:flVelModifier);
