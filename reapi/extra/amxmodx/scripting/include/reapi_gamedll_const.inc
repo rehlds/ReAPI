@@ -948,7 +948,7 @@ enum GamedllFunc_CBasePlayer
 	RG_CBasePlayer_UpdateStatusBar,
 
 	/*
-	* Description:      -
+	* Description:      Called for the victim player after taking damage, when "knockback" and "pain shock" are applied.
 	* Params:           (const this, attacker, Float:flKnockbackForce, Float:flVelModifier)
 	*/
 	RG_CBasePlayer_TakeDamageImpulse,
