@@ -1246,6 +1246,7 @@ native rg_send_death_message(const pKiller, const pVictim, const pAssister, cons
 */
 native rg_player_takedamage_impulse(const player, const attacker, const Float:flKnockbackForce, const Float:flVelModifier);
 
+/*
 * Restarts entities with the specified classname.
 *
 * @param classname             Classname to search for
@@ -1396,6 +1397,3 @@ native rg_bubble_trail(Float:from[3], Float:to[3], const bubbleCount);
 *
 */
 native rg_texture_hit(const ptr, Float:vecSrc[3], Float:vecEnd[3], output[], len);
-
-
-
