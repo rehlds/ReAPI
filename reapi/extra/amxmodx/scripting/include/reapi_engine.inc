@@ -280,14 +280,16 @@ native rh_get_net_from(output[], len);
 native rh_get_client_connect_time(const index);
 
 /*
-* Checks if a specific entity is fully packed in a given frame for a host client.
+* Checks if a specific entity is present in the host's outgoing entity table for a given frame,
+* indicating it has passed the visibility check (AddToFullPack) and is ready for client transmission.
 *
-* @param index      Client index for whom we are checking the entity.
+* @param host       Host index for whom we are checking the entity. (Host cannot be a fake client)
 * @param entity     Entity index to find in the table of entities for the given frame.
 * @param frame      Frame index where to look. Default is -1, which checks the previous frame.
 * @note             To check in the current frame, this native should be called at the end of the server frame.
 *
-* @return           Returns true if the entity is fully packed and ready to be sent to all clients in the given frame, otherwise false.
+* @return           Returns true if the entity is present in the host's outgoing entity table and
+*                   ready to be sent to all clients in the given frame, otherwise false.
 */
 native bool:rh_is_entity_fullpacked(const host, const entity, const frame = -1);
 
@@ -297,6 +299,24 @@ native bool:rh_is_entity_fullpacked(const host, const entity, const frame = -1);
 * @return           Real game time
 */
 native Float:rh_get_realtime();
+
+/*
+* Checks if server paused
+*
+* @return           Returns true if paused, otherwise false.
+*
+*/
+native bool:rh_is_server_paused();
+
+/*
+* Set server pause state
+*
+* @param status    pause state
+*
+* @noreturn
+*
+*/
+native rh_set_server_pause(const bool:status);
 
 enum MessageHook
 {

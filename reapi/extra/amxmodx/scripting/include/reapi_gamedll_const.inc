@@ -940,6 +940,18 @@ enum GamedllFunc_CBasePlayer
 	* Params:           (const this, bool:removeSuit)
 	*/
 	RG_CBasePlayer_RemoveAllItems,
+
+	/*
+	* Description:      -
+	* Params:           (const this)
+	*/
+	RG_CBasePlayer_UpdateStatusBar,
+
+	/*
+	* Description:      Called for the victim player after taking damage, when "knockback" and "pain shock" are applied.
+	* Params:           (const this, attacker, Float:flKnockbackForce, Float:flVelModifier)
+	*/
+	RG_CBasePlayer_TakeDamageImpulse,
 };
 
 /**
@@ -1094,7 +1106,7 @@ enum GamedllFunc_CSGameRules
 
 	/*
 	* Description:      Can this player take damage from this attacker?
-	* Return type:      float
+	* Return type:      BOOL
 	* Params:           (const index, const attacker)
 	*/
 	RG_CSGameRules_FPlayerCanTakeDamage,

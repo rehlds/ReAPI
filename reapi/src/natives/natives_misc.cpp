@@ -2076,16 +2076,18 @@ cell AMX_NATIVE_CALL rg_send_bartime2(AMX *amx, cell *params)
 	CHECK_CONNECTED(pPlayer, arg_index);
 
 	CAmxArgs args(amx, params);
+	int duration = args[arg_time];
 	float startPercent = args[arg_start_percent];
 	if (!args[arg_observer]) {
 		EMESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgBarTime2, nullptr, pPlayer->edict());
-			EWRITE_SHORT(args[arg_time]);
+			EWRITE_SHORT(duration);
 			EWRITE_SHORT(startPercent);
 		EMESSAGE_END();
 		return TRUE;
 	}
 
-	pPlayer->CSPlayer()->SetProgressBarTime2(args[arg_time], startPercent);
+	float timeElapsed = (startPercent / 100.0f) * duration;
+	pPlayer->CSPlayer()->SetProgressBarTime2(duration, timeElapsed);
 	return TRUE;
 }
 
@@ -3243,6 +3245,34 @@ cell AMX_NATIVE_CALL rg_set_observer_mode(AMX* amx, cell* params)
 }
 
 /*
+* Call origin function CBasePlayer::Observer_FindNextPlayer()
+* @note Player must be a valid observer (m_afPhysicsFlags & PFLAG_OBSERVER).
+*
+* @param player                Player index.
+* @param bReverse              If bReverse is true, finding order will be reversed
+* @param name                  Player name to find.
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_observer_find_next_player(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_bReverse, arg_name };
+
+	CHECK_ISPLAYER(arg_index)
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	char nameBuf[MAX_PLAYER_NAME_LENGTH];
+	const char* name = getAmxString(amx, params[arg_name], nameBuf);
+	if (strcmp(name, "") == 0)
+		name = nullptr;
+
+	pPlayer->CSPlayer()->Observer_FindNextPlayer(params[arg_bReverse] != 0, name);
+	return TRUE;
+}
+
+/*
 * Emits a death notice (logs, DeathMsg event, win conditions check)
 *
 * @param pVictim               Player index.
@@ -3342,6 +3372,47 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 	const char *weaponName = getAmxString(amx, params[arg_weaponname], weaponStr);
 
 	CSGameRules()->SendDeathMessage(pKiller, pVictim, pAssister, args[arg_inflictor], weaponName, args[arg_deathmsgflags], args[arg_rarityofkill]);
+	return TRUE;
+}
+ 
+/*
+* Adds impulse to the player.
+*
+* @param player                 Player index.
+* @param attacker               Attacker index.
+* @param flKnockbackForce       Knockback force.
+* @param flVelModifier          Velocity modifier.
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_player_takedamage_impulse(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_attacker, arg_knockback_force, arg_vel_modifier };
+
+	CHECK_ISPLAYER(arg_index);
+	CHECK_ISPLAYER(arg_attacker);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	if (!pPlayer->IsAlive())
+	{
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: player %d not alive", __FUNCTION__, params[arg_index]);
+		return FALSE;
+	}
+
+	CBasePlayer *pAttacker = UTIL_PlayerByIndex(params[arg_attacker]);
+	CHECK_CONNECTED(pAttacker, arg_attacker);
+
+	if (!pAttacker->IsAlive())
+	{
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: attacker %d not alive", __FUNCTION__, params[arg_attacker]);
+		return FALSE;
+	}
+
+	CAmxArgs args(amx, params);
+	pPlayer->CSPlayer()->TakeDamageImpulse(pAttacker, args[arg_knockback_force], args[arg_vel_modifier]);
+
 	return TRUE;
 }
 
@@ -3602,6 +3673,7 @@ cell AMX_NATIVE_CALL rg_texture_hit(AMX* amx, cell* params)
 
 	setAmxString(dest, textureType, length);
 	return TRUE;
+  
 }
 
 AMX_NATIVE_INFO Misc_Natives_RG[] =
@@ -3714,10 +3786,12 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_switch_best_weapon",        rg_switch_best_weapon        },
 	{ "rg_disappear",                 rg_disappear                 },
 	{ "rg_set_observer_mode",         rg_set_observer_mode         },
+	{ "rg_observer_find_next_player", rg_observer_find_next_player },
 	{ "rg_death_notice",              rg_death_notice              },
 	{ "rg_player_relationship",       rg_player_relationship       },
 
 	{ "rg_send_death_message",        rg_send_death_message        },
+	{ "rg_player_takedamage_impulse", rg_player_takedamage_impulse },
 
 	{ "rg_restart_other",             rg_restart_other             },
 	{ "rg_reset_entities",            rg_reset_entities            },
@@ -3957,33 +4031,41 @@ cell AMX_NATIVE_CALL rh_get_client_connect_time(AMX *amx, cell *params)
 }
 
 /*
-* Checks if a specific entity is fully packed in a given frame for a host client.
+* Checks if a specific entity is present in the host's outgoing entity table for a given frame,
+* indicating it has passed the visibility check (AddToFullPack) and is ready for client transmission.
 *
-* @param index      Client index for whom we are checking the entity.
+* @param host       Host index for whom we are checking the entity. (Host cannot be a fake client)
 * @param entity     Entity index to find in the table of entities for the given frame.
 * @param frame      Frame index where to look. Default is -1, which checks the previous frame.
 * @note             To check in the current frame, this native should be called at the end of the server frame.
 *
-* @return           Returns true if the entity is fully packed and ready to be sent to all clients in the given frame, otherwise false.
+* @return           Returns true if the entity is present in the host's outgoing entity table and
+*                   ready to be sent to all clients in the given frame, otherwise false.
 *
 * native bool:rh_is_entity_fullpacked(const host, const entity, const frame = -1);
 */
 cell AMX_NATIVE_CALL rh_is_entity_fullpacked(AMX *amx, cell *params)
 {
-	enum args_e { arg_count, arg_index, arg_entity, arg_frame };
+	enum args_e { arg_count, arg_host, arg_entity, arg_frame };
 
 	const int SV_UPDATE_BACKUP = (gpGlobals->maxClients == 1) ? SINGLEPLAYER_BACKUP : MULTIPLAYER_BACKUP;
 	const int SV_UPDATE_MASK   = (SV_UPDATE_BACKUP - 1);
 
-	CHECK_ISPLAYER(arg_index);
+	CHECK_ISPLAYER(arg_host);
 
-	client_t *pClient = clientOfIndex(params[arg_index]);
-	CHECK_CLIENT_CONNECTED(pClient, arg_index);
+	client_t *pHost = clientOfIndex(params[arg_host]);
+	CHECK_CLIENT_CONNECTED(pHost, arg_host);
+
+	if (pHost->fakeclient)
+	{
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: Entity checking for fake client (#%d) is invalid. Fake clients do not process entity updates.", __FUNCTION__, params[arg_host]);
+		return FALSE;
+	}
 
 	int iEntity = params[arg_entity];
 	int iFrame = params[arg_frame];
 
-	client_frame_t *frame = &pClient->frames[(pClient->netchan.outgoing_sequence + iFrame) & SV_UPDATE_MASK];
+	client_frame_t *frame = &pHost->frames[(pHost->netchan.outgoing_sequence + iFrame) & SV_UPDATE_MASK];
 	packet_entities_t *fullpack = &frame->entities;
 
 	for (int i = 0; i < fullpack->num_entities; i++)
@@ -3994,6 +4076,34 @@ cell AMX_NATIVE_CALL rh_is_entity_fullpacked(AMX *amx, cell *params)
 	}
 
 	return FALSE;
+}
+
+/*
+* Checks if server paused
+*
+* @return           Returns true if paused, otherwise false.
+*
+* native bool:rh_is_server_paused();
+*/
+cell AMX_NATIVE_CALL rh_is_server_paused(AMX *amx, cell *params)
+{
+	return g_RehldsData->IsPaused() ? TRUE : FALSE;
+}
+
+/*
+* Set server pause state
+*
+* @param st    pause state
+*
+* @noreturn
+*
+* native rh_set_server_pause(const bool:status);
+*/
+cell AMX_NATIVE_CALL rh_set_server_pause(AMX *amx, cell *params)
+{
+	enum { arg_count, arg_status };
+	g_RehldsFuncs->SetServerPause(params[arg_status] != 0);
+	return TRUE;
 }
 
 AMX_NATIVE_INFO Misc_Natives_RH[] =
@@ -4008,6 +4118,8 @@ AMX_NATIVE_INFO Misc_Natives_RH[] =
 	{ "rh_get_realtime",            rh_get_realtime            },
 	{ "rh_is_entity_fullpacked",    rh_is_entity_fullpacked    },
 	{ "rh_get_client_connect_time", rh_get_client_connect_time },
+	{ "rh_is_server_paused",        rh_is_server_paused        },
+	{ "rh_set_server_pause",        rh_set_server_pause        },
 
 	{ nullptr, nullptr }
 };

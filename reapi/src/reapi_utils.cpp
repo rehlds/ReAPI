@@ -168,12 +168,19 @@ void GetBonePosition(CBaseEntity *pEntity, int iBone, Vector *pVecOrigin, Vector
 	if (iBone < 0 || iBone >= pstudiohdr->numbones)
 		return; // invalid bone
 
+	float flFrame = pEdict->v.frame;
+	float flAnimTime = pEdict->v.animtime;
+
 	// force to update frame
 	StudioFrameAdvanceEnt(pstudiohdr, pEdict);
 
 	pEntity->pev->angles.x = -pEntity->pev->angles.x;
 	GET_BONE_POSITION(pEdict, iBone, vecOrigin, vecAngles);
 	pEntity->pev->angles.x = -pEntity->pev->angles.x;
+
+	// restore the original state for the entity
+	pEdict->v.frame = flFrame;
+	pEdict->v.animtime = flAnimTime;
 
 	// ReGameDLL already have fixes angles for non-players entities
 	if (!g_ReGameApi && !pEntity->IsPlayer()) {
@@ -204,10 +211,17 @@ void GetAttachment(CBaseEntity *pEntity, int iAttachment, Vector *pVecOrigin, Ve
 	if (iAttachment < 0 || iAttachment >= pstudiohdr->numattachments)
 		return; // invalid attachment
 
+	float flFrame = pEdict->v.frame;
+	float flAnimTime = pEdict->v.animtime;
+
 	// force to update frame
 	StudioFrameAdvanceEnt(pstudiohdr, pEdict);
 
 	GET_ATTACHMENT(pEdict, iAttachment, vecOrigin, vecAngles);
+
+	// restore the original state for the entity
+	pEdict->v.frame = flFrame;
+	pEdict->v.animtime = flAnimTime;
 
 	// ReGameDLL already have fixes angles for non-players entities
 	if (!g_ReGameApi && !pEntity->IsPlayer()) {
@@ -281,7 +295,7 @@ bool GetSequenceInfo2(CBaseEntity *pEntity, int *piFlags, float *pflFrameRate, f
 		*pflFrameRate = 256.0f;
 		*pflGroundSpeed = 0.0f;
 	}
-	else 
+	else
 	{
 		*pflFrameRate = pseqdesc->fps * 256.0f / (pseqdesc->numframes - 1);
 		*pflGroundSpeed = Q_sqrt(pseqdesc->linearmovement[0] * pseqdesc->linearmovement[0] + pseqdesc->linearmovement[1] * pseqdesc->linearmovement[1] + pseqdesc->linearmovement[2] * pseqdesc->linearmovement[2]);
