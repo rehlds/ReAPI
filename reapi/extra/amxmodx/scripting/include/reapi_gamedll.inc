@@ -1223,7 +1223,7 @@ native rg_player_relationship(const player, const target);
 native rg_send_death_message(const pKiller, const pVictim, const pAssister, const pevInflictor, const killerWeaponName[], const DeathMessageFlags:iDeathMessageFlags, const KillRarity:iRarityOfKill);
 
 /*
-* -
+* Restarts entities with the specified classname.
 *
 * @param classname             Classname to search for
 *
@@ -1232,14 +1232,14 @@ native rg_send_death_message(const pKiller, const pVictim, const pAssister, cons
 native rg_restart_other(const classname[]);
 
 /*
-* -
+* Resets all entities to their original state.
 *
 * @noreturn
 */
 native rg_reset_entities();
 
 /*
-* -
+* Removes a specified number of entities matching the given classname.
 *
 * @param classname             Classname to search for
 * @param removeCount           Remove count
@@ -1249,7 +1249,7 @@ native rg_reset_entities();
 native rg_remove_other(const classname[], const removeCount);
 
 /*
-* -
+* Generates a random long integer within a specified range.
 *
 * @param seed                  Seed
 * @param low                   Low
@@ -1260,7 +1260,7 @@ native rg_remove_other(const classname[], const removeCount);
 native rg_shared_random_long(const seed, const low, const high);
 
 /*
-* -
+* Generates a random float within a specified range.
 *
 * @param seed                  Seed
 * @param low                   Low
@@ -1271,7 +1271,7 @@ native rg_shared_random_long(const seed, const low, const high);
 native Float:rg_shared_random_float(const seed, const Float:low, const Float:high);
 
 /*
-* -
+* Sets the group trace mask.
 *
 * @param groupmask             Group Mask
 * @param op                    Operation
@@ -1280,27 +1280,15 @@ native Float:rg_shared_random_float(const seed, const Float:low, const Float:hig
 */
 native rg_set_group_trace(const groupmask, const op);
 
-
 /*
-* -
+* Unsets the group trace mask.
 *
 * @noreturn
 */
 native rg_unset_group_trace();
 
 /*
-* -
-*
-* @param start_index           Entity index to start searching from. AMX_NULLENT (-1) to start from the first entity
-* @param vecCenter             Center
-* @param radius                Radius
-*
-* @return                      Entity index > 0 if found, 0 otherwise
-*/
-native rg_find_entity_in_sphere(const start_index, Float:vecCenter[3], const Float:radius);
-
-/*
-* -
+* Creates a screen shake effect.
 *
 * @param vecCenter             Center
 * @param amplitude             Amplitude
@@ -1313,7 +1301,7 @@ native rg_find_entity_in_sphere(const start_index, Float:vecCenter[3], const Flo
 native rg_screen_shake(Float:vecCenter[3], const Float:amplitude, const Float:frequency, const Float:duration, const Float:radius);
 
 /*
-* -
+* Fades the screen for all players.
 *
 * @param vecColor              Color
 * @param fadeTime              Fade Time
@@ -1326,7 +1314,7 @@ native rg_screen_shake(Float:vecCenter[3], const Float:amplitude, const Float:fr
 native rg_screen_fade_all(Float:vecColor[3], const Float:fadeTime, const Float:fadeHold, const alpha, const flags);
 
 /*
-* -
+* Fades the screen for a specific player.
 *
 * @param index                 Client index
 * @param vecColor              Color
@@ -1340,37 +1328,7 @@ native rg_screen_fade_all(Float:vecColor[3], const Float:fadeTime, const Float:f
 native rg_screen_fade(const index, Float:vecColor[3], const Float:fadeTime, const Float:fadeHold, const alpha, const flags);
 
 /*
-* -
-*
-* @param index                 Entity index
-* @param vecMin                Min
-* @param vecMax                Max
-*
-* @noreturn
-*/
-native rg_set_size(const index, Float:vecMin[3], Float:vecMax[3]);
-
-/*
-* -
-*
-* @param index                 Entity index
-* @param vecOrigin             Origin
-*
-* @noreturn
-*/
-native rg_set_origin(const index, Float:vecOrigin[3]);
-
-/*
-* -
-*
-* @param vec                   Origin
-*
-* @return                      -
-*/
-native rg_point_contents(Float:vec[3]);
-
-/*
-* -
+* Gets the water level at a specific position.
 *
 * @param position              Entity index
 * @param minz                  Min Z
@@ -1381,7 +1339,7 @@ native rg_point_contents(Float:vec[3]);
 native Float:rg_water_level(Float:position[3], const Float:minz, const Float:maxz);
 
 /*
-* -
+* Creates bubbles within a specified area.
 *
 * @param vecMins               Mins
 * @param vecMaxs               Maxs
@@ -1392,7 +1350,7 @@ native Float:rg_water_level(Float:position[3], const Float:minz, const Float:max
 native rg_bubbles(Float:vecMins[3], Float:vecMaxs[3], const bubbleCount);
 
 /*
-* -
+* Creates a trail of bubbles between two points.
 *
 * @param from                  Start position
 * @param to                    End position
@@ -1403,19 +1361,15 @@ native rg_bubbles(Float:vecMins[3], Float:vecMaxs[3], const bubbleCount);
 native rg_bubble_trail(Float:from[3], Float:to[3], const bubbleCount);
 
 /*
-* -
+* Retrieves the texture type hit by a traceresult, based on start and end positions.
 *
-* @param classname             Classname to search for
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param vecSrc                Start position
+* @param vecEnd                End position
+* @param output                Buffer to copy the texture type
+* @param len                   Maximum buffer size
 *
-* @return                      Entities Count
+* @noreturn
+*
 */
-native rg_count_entities(const classname[]);
-
-/*
-* -
-*
-* @param spot                  Spot to check
-*
-* @return                      1 on success, 0 otherwise
-*/
-native bool:rg_is_spawn_point_occupied(const spot);
+native rg_texture_hit(const ptr, Float:vecSrc[3], Float:vecEnd[3], output[], len);

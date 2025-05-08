@@ -3345,6 +3345,13 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 	return TRUE;
 }
 
+/*
+* Restarts entities with the specified classname.
+*
+* @param classname             Classname to search for
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_restart_other(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_classname };
@@ -3356,6 +3363,11 @@ cell AMX_NATIVE_CALL rg_restart_other(AMX* amx, cell* params)
 	return TRUE;
 }
 
+/*
+* Resets all entities to their original state.
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_reset_entities(AMX* amx, cell* params)
 {
 	enum args_e { arg_count };
@@ -3364,6 +3376,14 @@ cell AMX_NATIVE_CALL rg_reset_entities(AMX* amx, cell* params)
 	return TRUE;
 }
 
+/*
+* Removes a specified number of entities matching the given classname.
+*
+* @param classname             Classname to search for
+* @param removeCount           Remove count
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_remove_other(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_classname, arg_removeCount };
@@ -3376,6 +3396,15 @@ cell AMX_NATIVE_CALL rg_remove_other(AMX* amx, cell* params)
 	return TRUE;
 }
 
+/*
+* Generates a random long integer within a specified range.
+*
+* @param seed                  Seed
+* @param low                   Low
+* @param high                  High
+*
+* @return                      -
+*/
 cell AMX_NATIVE_CALL rg_shared_random_long(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_seed, arg_low, arg_high };
@@ -3384,6 +3413,15 @@ cell AMX_NATIVE_CALL rg_shared_random_long(AMX* amx, cell* params)
 	return g_ReGameFuncs->UTIL_SharedRandomLong(args[arg_seed], args[arg_low], args[arg_high]);
 }
 
+/*
+* Generates a random float within a specified range.
+*
+* @param seed                  Seed
+* @param low                   Low
+* @param high                  High
+*
+* @return                      -
+*/
 cell AMX_NATIVE_CALL rg_shared_random_float(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_seed, arg_low, arg_high };
@@ -3392,6 +3430,14 @@ cell AMX_NATIVE_CALL rg_shared_random_float(AMX* amx, cell* params)
 	return g_ReGameFuncs->UTIL_SharedRandomFloat(args[arg_seed], args[arg_low], args[arg_high]);
 }
 
+/*
+* Sets the group trace mask.
+*
+* @param groupmask             Group Mask
+* @param op                    Operation
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_set_group_trace(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_groupmask, arg_op };
@@ -3401,6 +3447,11 @@ cell AMX_NATIVE_CALL rg_set_group_trace(AMX* amx, cell* params)
 	return TRUE;
 }
 
+/*
+* Unsets the group trace mask.
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_unset_group_trace(AMX* amx, cell* params)
 {
 	enum args_e { arg_count };
@@ -3409,22 +3460,17 @@ cell AMX_NATIVE_CALL rg_unset_group_trace(AMX* amx, cell* params)
 	return TRUE;
 }
 
-cell AMX_NATIVE_CALL rg_find_entity_in_sphere(AMX* amx, cell* params)
-{
-	enum args_e { arg_count, arg_start_index, arg_vecCenter, arg_radius };
-
-	auto pStartEntity = getPrivate<CBaseEntity>(params[arg_start_index]);
-
-	CAmxArgs args(amx, params);
-	auto pEntity = g_ReGameFuncs->UTIL_FindEntityInSphere(pStartEntity, args[arg_vecCenter], args[arg_radius]);
-
-	if (pEntity) {
-		return indexOfEdict(pEntity->pev);
-	}
-
-	return 0;
-}
-
+/*
+* Creates a screen shake effect.
+*
+* @param vecCenter             Center
+* @param amplitude             Amplitude
+* @param frequency             Frequency
+* @param duration              Duration
+* @param radius                Radius
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_screen_shake(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_center, arg_amplitude, arg_frequency, arg_duration, arg_radius };
@@ -3434,6 +3480,17 @@ cell AMX_NATIVE_CALL rg_screen_shake(AMX* amx, cell* params)
 	return TRUE;
 }
 
+/*
+* Fades the screen for all players.
+*
+* @param vecColor              Color
+* @param fadeTime              Fade Time
+* @param fadeHold              Fade Hold
+* @param alpha                 Alpha
+* @param flags                 Flags
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_screen_fade_all(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_color, arg_fadeTime, arg_fadeHold, arg_alpha, arg_flags };
@@ -3443,6 +3500,18 @@ cell AMX_NATIVE_CALL rg_screen_fade_all(AMX* amx, cell* params)
 	return TRUE;
 }
 
+/*
+* Fades the screen for a specific player.
+*
+* @param index                 Client index
+* @param vecColor              Color
+* @param fadeTime              Fade Time
+* @param fadeHold              Fade Hold
+* @param alpha                 Alpha
+* @param flags                 Flags
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_screen_fade(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_entity, arg_color, arg_fadeTime, arg_fadeHold, arg_alpha, arg_flags };
@@ -3455,52 +3524,15 @@ cell AMX_NATIVE_CALL rg_screen_fade(AMX* amx, cell* params)
 	return TRUE;
 }
 
-cell AMX_NATIVE_CALL rg_set_size(AMX* amx, cell* params)
-{
-	enum args_e { arg_count, arg_index, arg_vecMin, arg_vecMax };
-
-	CHECK_ISENTITY(arg_index);
-
-	CBaseEntity* pEntity = getPrivate<CBaseEntity>(params[arg_index]);
-	if (unlikely(pEntity == nullptr)) {
-		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: invalid or uninitialized entity", __FUNCTION__);
-		return FALSE;
-	}
-
-	entvars_t* pevEntity = pEntity->pev;
-
-	CAmxArgs args(amx, params);
-	g_ReGameFuncs->UTIL_SetSize(pevEntity, args[arg_vecMin], args[arg_vecMax]);
-	return TRUE;
-}
-
-cell AMX_NATIVE_CALL rg_set_origin(AMX* amx, cell* params)
-{
-	enum args_e { arg_count, arg_index, arg_vecOrigin };
-
-	CHECK_ISENTITY(arg_index);
-
-	CBaseEntity* pEntity = getPrivate<CBaseEntity>(params[arg_index]);
-	if (unlikely(pEntity == nullptr)) {
-		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: invalid or uninitialized entity", __FUNCTION__);
-		return FALSE;
-	}
-
-	entvars_t* pevEntity = pEntity->pev;
-
-	CAmxArgs args(amx, params);
-	g_ReGameFuncs->UTIL_SetOrigin(pevEntity, args[arg_vecOrigin]);
-	return TRUE;
-}
-
-cell AMX_NATIVE_CALL rg_point_contents(AMX* amx, cell* params)
-{
-	enum args_e { arg_count, arg_vec };
-
-	CAmxArgs args(amx, params);
-	return g_ReGameFuncs->UTIL_PointContents(args[arg_vec]);
-}
-
+/*
+* Gets the water level at a specific position.
+*
+* @param position              Entity index
+* @param minz                  Min Z
+* @param maxz                  Max Z
+*
+* @return                      -
+*/
 cell AMX_NATIVE_CALL rg_water_level(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_position, arg_minz, arg_maxz };
@@ -3509,6 +3541,15 @@ cell AMX_NATIVE_CALL rg_water_level(AMX* amx, cell* params)
 	return g_ReGameFuncs->UTIL_WaterLevel(args[arg_position], args[arg_minz], args[arg_maxz]);
 }
 
+/*
+* Creates bubbles within a specified area.
+*
+* @param vecMins               Mins
+* @param vecMaxs               Maxs
+* @param bubbleCount           Bubble Count
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_bubbles(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_mins, arg_maxs, arg_bubbleCount };
@@ -3518,6 +3559,15 @@ cell AMX_NATIVE_CALL rg_bubbles(AMX* amx, cell* params)
 	return TRUE;
 }
 
+/*
+* Creates a trail of bubbles between two points.
+*
+* @param from                  Start position
+* @param to                    End position
+* @param bubbleCount           Bubble Count
+*
+* @noreturn
+*/
 cell AMX_NATIVE_CALL rg_bubble_trail(AMX* amx, cell* params)
 {
 	enum args_e { arg_count, arg_from, arg_to, arg_bubbleCount };
@@ -3527,27 +3577,32 @@ cell AMX_NATIVE_CALL rg_bubble_trail(AMX* amx, cell* params)
 	return TRUE;
 }
 
-cell AMX_NATIVE_CALL rg_count_entities(AMX* amx, cell* params)
+/*
+* Retrieves the texture type hit by a traceresult, based on start and end positions.
+*
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param vecSrc                Start position
+* @param vecEnd                End position
+* @param output                Buffer to copy the texture type
+* @param len                   Maximum buffer size
+*
+* @noreturn
+*
+* native rg_texture_hit(const ptr, Float:vecSrc[3], Float:vecEnd[3], output[], len);
+*/
+cell AMX_NATIVE_CALL rg_texture_hit(AMX* amx, cell* params)
 {
-	enum args_e { arg_count, arg_classname };
+	enum args_e { arg_count, arg_trace, arg_src, arg_end, arg_output, arg_maxlen };
 
-	char classname[256];
-	const char* value = getAmxString(amx, params[arg_classname], classname);
+	CAmxArgs args(amx, params);
 
-	return g_ReGameFuncs->UTIL_CountEntities(value);
+	cell* dest = getAmxAddr(amx, params[arg_output]);
+	size_t length = *getAmxAddr(amx, params[arg_maxlen]);
+	const char* textureType = g_ReGameFuncs->UTIL_TextureHit(args[arg_trace], args[arg_src], args[arg_end]);
+
+	setAmxString(dest, textureType, length);
+	return TRUE;
 }
-
-cell AMX_NATIVE_CALL rg_is_spawn_point_occupied(AMX* amx, cell* params)
-{
-	enum args_e { arg_count, arg_spot };
-
-	CHECK_ISENTITY(arg_spot);
-
-	CBaseEntity* pSpot = getPrivate<CBaseEntity>(params[arg_spot]);
-
-	return g_ReGameFuncs->UTIL_IsSpawnPointOccupied(pSpot);
-}
-
 
 AMX_NATIVE_INFO Misc_Natives_RG[] =
 {
@@ -3671,18 +3726,13 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_shared_random_float",       rg_shared_random_float       },
 	{ "rg_set_group_trace",           rg_set_group_trace           },
 	{ "rg_unset_group_trace",         rg_unset_group_trace         },
-	{ "rg_find_entity_in_sphere",     rg_find_entity_in_sphere     },
 	{ "rg_screen_shake",              rg_screen_shake              },
 	{ "rg_screen_fade_all",           rg_screen_fade_all           },
 	{ "rg_screen_fade",               rg_screen_fade               },
-	{ "rg_set_size",                  rg_set_size                  },
-	{ "rg_set_origin",                rg_set_origin                },
-	{ "rg_point_contents",            rg_point_contents            },
 	{ "rg_water_level",               rg_water_level               },
 	{ "rg_bubbles",                   rg_bubbles                   },
 	{ "rg_bubble_trail",              rg_bubble_trail              },
-	{ "rg_count_entities",            rg_count_entities            },
-	{ "rg_is_spawn_point_occupied",   rg_is_spawn_point_occupied   },
+	{ "rg_texture_hit",               rg_texture_hit               },
 
 	{ nullptr, nullptr }
 };

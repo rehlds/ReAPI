@@ -40,7 +40,7 @@
 #include <API/CSInterfaces.h>
 
 #define REGAMEDLL_API_VERSION_MAJOR 5
-#define REGAMEDLL_API_VERSION_MINOR 27
+#define REGAMEDLL_API_VERSION_MINOR 31
 
 // CBasePlayer::Spawn hook
 typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_Spawn;
@@ -823,19 +823,13 @@ struct ReGameFuncs_t {
 	void (*UTIL_SetGroupTrace)(int groupmask, int op);
 	void (*UTIL_UnsetGroupTrace)();
 	int (*UTIL_EntitiesInBox)(CBaseEntity **pList, int listMax, const Vector &mins, const Vector &maxs, int flagMask);
-	class CBaseEntity *(*UTIL_FindEntityInSphere)(CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius);
 	void (*UTIL_ScreenShake)(const Vector &center, float amplitude, float frequency, float duration, float radius);
 	void (*UTIL_ScreenFadeAll)(const Vector &color, float fadeTime, float fadeHold, int alpha, int flags);
 	void (*UTIL_ScreenFade)(CBaseEntity *pEntity, const Vector &color, float fadeTime, float fadeHold, int alpha, int flags);
-	void (*UTIL_SetSize)(entvars_t *pev, const Vector &vecMin, const Vector &vecMax);
-	void (*UTIL_SetOrigin)(entvars_t *pev, const Vector &vecOrigin);
-	int (*UTIL_PointContents)(const Vector &vec);
 	float (*UTIL_WaterLevel)(const Vector &position, float minz, float maxz);
 	void (*UTIL_Bubbles)(Vector mins, Vector maxs, int count);
 	void (*UTIL_BubbleTrail)(Vector from, Vector to, int count);
 	char (*UTIL_TextureHit)(TraceResult *ptr, Vector vecSrc, Vector vecEnd);
-	int (*UTIL_CountEntities)(const char *szName);
-	bool (*UTIL_IsSpawnPointOccupied)(CBaseEntity *pSpot);
 };
 
 class IReGameApi {
