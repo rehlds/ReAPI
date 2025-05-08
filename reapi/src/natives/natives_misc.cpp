@@ -3374,7 +3374,7 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 	CSGameRules()->SendDeathMessage(pKiller, pVictim, pAssister, args[arg_inflictor], weaponName, args[arg_deathmsgflags], args[arg_rarityofkill]);
 	return TRUE;
 }
- 
+
 /*
 * Adds impulse to the player.
 *
