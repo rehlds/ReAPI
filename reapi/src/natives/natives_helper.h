@@ -11,7 +11,7 @@
 #define CHECK_INSTANCE_OF(x, y)         if (unlikely(dynamic_cast<x *>((x::BaseClass *)y) == nullptr)) { AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: invalid entity %d ('%s'), is not an instance of the base class '%s'", __FUNCTION__, indexOfEdict(y->pev), STRING(y->pev->classname), #x); return FALSE; }
 #define CHECK_REQUIREMENTS(x)           if (unlikely(!api_cfg.has##x())) { AMXX_LogError(amx, AMX_ERR_NATIVE, "Native '%s' is not available, %s required.", __FUNCTION__, #x); return FALSE; } if (!g_RehldsMessageManager) { AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: %s message manager not initialized.", __FUNCTION__, #x); return FALSE; }
 
-#define ENTITY_VALIDATE(x)              if (unlikely(x < 0 || x > gpGlobals->maxEntities)) { AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: invalid entity index %i", __FUNCTION__, x); return FALSE; }
+#define AMX_ENTITY_VALIDATE(x, y)       if (unlikely(x < AMX_NULLENT || x > gpGlobals->maxEntities)) { AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: \"%s\" invalid entity index %i", __FUNCTION__, y, x); return FALSE; }
 
 class CAmxArg
 {

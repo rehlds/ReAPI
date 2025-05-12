@@ -97,6 +97,16 @@ inline size_t indexOfPDataAmx(const T* pdata)
 	return index;
 }
 
+inline cell amx_FloatToCell(REAL x)
+{
+	return *(cell *)&x;
+}
+
+inline float amx_CellToFloat(cell x)
+{
+	return *(REAL *)&x;
+}
+
 inline cell getAmxVector(Vector& vec)
 {
 	return g_amxxapi.PrepareCellArrayA(reinterpret_cast<cell *>(&vec), 3, true);

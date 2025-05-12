@@ -84,6 +84,8 @@ public:
 					// Execute the callback with the provided arguments
 					g_amxxapi.ExecuteForward(callback->GetFwdIndex(), args...);
 				}
+
+				break;
 			}
 		}
 

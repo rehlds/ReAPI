@@ -141,6 +141,8 @@
 #define EF_FORCEVISIBILITY              2048 // force visibility
 #define EF_OWNER_VISIBILITY             4096 // visibility for owner
 #define EF_OWNER_NO_VISIBILITY          8192 // no visibility for owner
+#define EF_NOSLERP                      16384 // no slerp flag for this entity (addtofullpack)
+#define EF_FOLLOWKEEPRENDER             32768 // the entity following will not copy the render (like it follows nothing)
 
 /**
 * Break Model Defines

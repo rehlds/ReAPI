@@ -1,4 +1,4 @@
-# Reapi [![Download](https://img.shields.io/github/downloads/s1lentq/ReGameDLL_CS/latest/total)](https://github.com/s1lentq/reapi/releases/latest) [![Downloads](https://img.shields.io/github/downloads/s1lentq/reapi/total)]() [![Percentage of issues still open](http://isitmaintained.com/badge/open/s1lentq/reapi.svg)](http://isitmaintained.com/project/s1lentq/reapi "Percentage of issues still open") [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+# [ReAPI](https://github.com/rehlds/ReAPI) [![Download](https://img.shields.io/github/downloads/s1lentq/ReGameDLL_CS/latest/total)](https://github.com/s1lentq/ReAPI/releases/latest) [![Downloads](https://img.shields.io/github/downloads/s1lentq/ReAPI/total)]() [![Percentage of issues still open](http://isitmaintained.com/badge/open/s1lentq/ReAPI.svg)](http://isitmaintained.com/project/s1lentq/ReAPI "Percentage of issues still open") [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 AMX Mod X module, using API regamedll &amp; rehlds
 
@@ -23,7 +23,7 @@ LLVM (Clang) >= 6.0 (Optional)
 ### Building
 
 #### Windows
-Use `Visual Studio` to build, open `msvc/reapi.sln` and just select from the solution configurations list `Release` or `Debug`
+Use `Visual Studio` to build, open `msvc/ReAPI.sln` and just select from the solution configurations list `Release` or `Debug`
 
 #### Linux
 
