@@ -3674,8 +3674,7 @@ cell AMX_NATIVE_CALL rg_texture_hit(AMX* amx, cell* params)
 	const char buffer[2] = { textureType, '\0' };
 	setAmxString(dest, buffer, length);
 
-	return TRUE;
-  
+	return TRUE;  
 }
 
 AMX_NATIVE_INFO Misc_Natives_RG[] =
