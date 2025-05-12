@@ -3370,14 +3370,12 @@ cell AMX_NATIVE_CALL rg_restart_other(AMX* amx, cell* params)
 */
 cell AMX_NATIVE_CALL rg_reset_entities(AMX* amx, cell* params)
 {
-	enum args_e { arg_count };
-
 	g_ReGameFuncs->UTIL_ResetEntities();
 	return TRUE;
 }
 
 /*
-* Removes a specified number of entities matching the given classname.
+* Removes entities matching the given classname, optionally limited to a specified number of entities.
 *
 * @param classname             Classname to search for
 * @param removeCount           Remove count
@@ -3403,7 +3401,7 @@ cell AMX_NATIVE_CALL rg_remove_other(AMX* amx, cell* params)
 * @param low                   Low
 * @param high                  High
 *
-* @return                      -
+* @return                      A random long integer between "low" and "high" (inclusive)
 */
 cell AMX_NATIVE_CALL rg_shared_random_long(AMX* amx, cell* params)
 {
@@ -3420,7 +3418,7 @@ cell AMX_NATIVE_CALL rg_shared_random_long(AMX* amx, cell* params)
 * @param low                   Low
 * @param high                  High
 *
-* @return                      -
+* @return                      A random float between "low" and "high" (inclusive)
 */
 cell AMX_NATIVE_CALL rg_shared_random_float(AMX* amx, cell* params)
 {
@@ -3431,7 +3429,7 @@ cell AMX_NATIVE_CALL rg_shared_random_float(AMX* amx, cell* params)
 }
 
 /*
-* Sets the group trace mask.
+* Sets the group trace mask and operation.
 *
 * @param groupmask             Group Mask
 * @param op                    Operation
@@ -3448,20 +3446,18 @@ cell AMX_NATIVE_CALL rg_set_group_trace(AMX* amx, cell* params)
 }
 
 /*
-* Unsets the group trace mask.
+* Resets the group trace mask to its default state.
 *
 * @noreturn
 */
 cell AMX_NATIVE_CALL rg_unset_group_trace(AMX* amx, cell* params)
 {
-	enum args_e { arg_count };
-
 	g_ReGameFuncs->UTIL_UnsetGroupTrace();
 	return TRUE;
 }
 
 /*
-* Creates a screen shake effect.
+* Creates a screen shake effect for players within a specified radius.
 *
 * @param vecCenter             Center
 * @param amplitude             Amplitude
@@ -3531,7 +3527,7 @@ cell AMX_NATIVE_CALL rg_screen_fade(AMX* amx, cell* params)
 * @param minz                  Min Z
 * @param maxz                  Max Z
 *
-* @return                      -
+* @return                      The Z coordinate of the water surface
 */
 cell AMX_NATIVE_CALL rg_water_level(AMX* amx, cell* params)
 {
@@ -3587,8 +3583,6 @@ cell AMX_NATIVE_CALL rg_bubble_trail(AMX* amx, cell* params)
 * @param len                   Maximum buffer size
 *
 * @noreturn
-*
-* native rg_texture_hit(const ptr, Float:vecSrc[3], Float:vecEnd[3], output[], len);
 */
 cell AMX_NATIVE_CALL rg_texture_hit(AMX* amx, cell* params)
 {
@@ -3598,9 +3592,17 @@ cell AMX_NATIVE_CALL rg_texture_hit(AMX* amx, cell* params)
 
 	cell* dest = getAmxAddr(amx, params[arg_output]);
 	size_t length = *getAmxAddr(amx, params[arg_maxlen]);
-	const char* textureType = g_ReGameFuncs->UTIL_TextureHit(args[arg_trace], args[arg_src], args[arg_end]);
+	const char textureType = g_ReGameFuncs->UTIL_TextureHit(args[arg_trace], args[arg_src], args[arg_end]);
 
-	setAmxString(dest, textureType, length);
+	if (textureType == '\0')
+	{
+		setAmxString(dest, "", 1);
+		return TRUE;
+	}
+
+	const char buffer[2] = { textureType, '\0' };
+	setAmxString(dest, buffer, length);
+
 	return TRUE;
 }
 

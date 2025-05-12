@@ -1239,7 +1239,7 @@ native rg_restart_other(const classname[]);
 native rg_reset_entities();
 
 /*
-* Removes a specified number of entities matching the given classname.
+* Removes entities matching the given classname, optionally limited to a specified number of entities.
 *
 * @param classname             Classname to search for
 * @param removeCount           Remove count
@@ -1255,7 +1255,7 @@ native rg_remove_other(const classname[], const removeCount);
 * @param low                   Low
 * @param high                  High
 *
-* @return                      -
+* @return                      A random long integer between "low" and "high" (inclusive)
 */
 native rg_shared_random_long(const seed, const low, const high);
 
@@ -1266,12 +1266,12 @@ native rg_shared_random_long(const seed, const low, const high);
 * @param low                   Low
 * @param high                  High
 *
-* @return                      -
+* @return                      A random float between "low" and "high" (inclusive)
 */
 native Float:rg_shared_random_float(const seed, const Float:low, const Float:high);
 
 /*
-* Sets the group trace mask.
+* Sets the group trace mask and operation.
 *
 * @param groupmask             Group Mask
 * @param op                    Operation
@@ -1281,14 +1281,14 @@ native Float:rg_shared_random_float(const seed, const Float:low, const Float:hig
 native rg_set_group_trace(const groupmask, const op);
 
 /*
-* Unsets the group trace mask.
+* Resets the group trace mask to its default state.
 *
 * @noreturn
 */
 native rg_unset_group_trace();
 
 /*
-* Creates a screen shake effect.
+* Creates a screen shake effect for players within a specified radius.
 *
 * @param vecCenter             Center
 * @param amplitude             Amplitude
@@ -1334,7 +1334,7 @@ native rg_screen_fade(const index, Float:vecColor[3], const Float:fadeTime, cons
 * @param minz                  Min Z
 * @param maxz                  Max Z
 *
-* @return                      -
+* @return                      The Z coordinate of the water surface
 */
 native Float:rg_water_level(Float:position[3], const Float:minz, const Float:maxz);
 
@@ -1370,6 +1370,5 @@ native rg_bubble_trail(Float:from[3], Float:to[3], const bubbleCount);
 * @param len                   Maximum buffer size
 *
 * @noreturn
-*
 */
 native rg_texture_hit(const ptr, Float:vecSrc[3], Float:vecEnd[3], output[], len);
