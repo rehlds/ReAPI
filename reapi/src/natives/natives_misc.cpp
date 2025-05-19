@@ -3437,7 +3437,7 @@ cell AMX_NATIVE_CALL rg_trace_line(AMX *amx, cell *params)
 	CAmxArgs args(amx, params);
 
 	gpGlobals->trace_flags = args[arg_trace_flags];
-	TRACE_LINE(args[arg_vec_start], args[arg_vec_end], args[arg_ignore_monsters], pEntityIgnore, args[arg_trace]);
+	g_pengfuncsTable->pfnTraceLine(args[arg_vec_start], args[arg_vec_end], args[arg_ignore_monsters], pEntityIgnore, args[arg_trace]);
 
 	return TRUE;
 }
@@ -3464,7 +3464,7 @@ cell AMX_NATIVE_CALL rg_trace_hull(AMX *amx, cell *params)
 	CAmxArgs args(amx, params);
 
 	gpGlobals->trace_flags = args[arg_trace_flags];
-	TRACE_HULL(args[arg_vec_start], args[arg_vec_end], args[arg_ignore_monsters], args[arg_hull_number], pEntityIgnore, args[arg_trace]);
+	g_pengfuncsTable->pfnTraceHull(args[arg_vec_start], args[arg_vec_end], args[arg_ignore_monsters], args[arg_hull_number], pEntityIgnore, args[arg_trace]);
 	gpGlobals->trace_flags = 0;
 
 	return TRUE;
