@@ -1270,7 +1270,7 @@ native rg_reset_entities();
 *
 * @noreturn
 */
-native rg_remove_other(const classname[], const removeCount);
+native rg_remove_other(const classname[], const removeCount = 0);
 
 /*
 * Generates a random long integer within a specified range.
