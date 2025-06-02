@@ -1349,7 +1349,7 @@ native rg_screen_fade_all(Float:vecColor[3], const Float:fadeTime, const Float:f
 *
 * @noreturn
 */
-native rg_screen_fade(const index, Float:vecColor[3], const Float:fadeTime, const Float:fadeHold, const alpha, const flags);
+native rg_screen_fade(const index, Float:vecColor[3], const Float:fadeTime, const Float:fadeHold = 0.0, const alpha = 0, const flags = 0);
 
 /*
 * Gets the water level at a specific position.
