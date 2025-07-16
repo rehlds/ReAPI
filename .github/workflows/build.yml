@@ -76,10 +76,10 @@ jobs:
           $toolset = '${{ steps.select_toolset.outputs.toolset }}'
           msbuild ${{ env.solution }} -p:Configuration="${{ env.buildRelease }}" /t:Clean,Build /p:Platform=${{ env.buildPlatform }} /p:PlatformToolset=$toolset /p:XPDeprecationWarning=false
 
-#      - name: Get rcedit from chocolatey
-#        shell: pwsh
-#        run: |
-#          choco install rcedit -y
+      - name: Get rcedit from chocolatey
+        shell: pwsh
+        run: |
+          choco install rcedit -y
 
       - name: Move files
         run: |
@@ -113,6 +113,11 @@ jobs:
 
       - name: Show version
         run: echo "Version is ${{ steps.get_version.outputs.version }}"
+
+      - name: Edit resources at windows binaries
+        run: |
+         rcedit ${{ github.workspace }}\publish\addons\amxmodx\modules\reapi_amxx.dll --set-version-string CompanyName "ReHLDS Dev Team" --set-version-string LegalCopyright "Copyright 2025 ReHLDS DevTeam" --set-icon reapi/msvc/icon.ico
+        shell: "pwsh"
 
       - name: Import PFX and sign
         if: github.event_name != 'pull_request'
@@ -307,5 +312,7 @@ jobs:
         with:
           files: |
             *.zip
+            *.7z
+            *.asc
         env:
           GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
