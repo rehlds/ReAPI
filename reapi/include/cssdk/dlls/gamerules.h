@@ -555,6 +555,13 @@ public:
 
 	virtual void SendDeathMessage(CBaseEntity *pKiller, CBasePlayer *pVictim, CBasePlayer *pAssister, entvars_t *pevInflictor, const char *killerWeaponName, int iDeathMessageFlags, int iRarityOfKill) = 0;
 
+	// Check various conditions to end the map.
+	virtual bool CheckGameOver() = 0;
+	virtual bool CheckTimeLimit() = 0;
+	virtual bool CheckFragLimit() = 0;
+	virtual bool CheckMaxRounds() = 0;
+	virtual bool CheckWinLimit() = 0;
+
 public:
 	bool ShouldSkipShowMenu() const { return m_bSkipShowMenu; }
 	void MarkShowMenuSkipped() { m_bSkipShowMenu = false; }
