@@ -890,14 +890,14 @@ enum GamedllFunc_CBasePlayer
 	/*
 	* Description:      Called when a client emits a "pain sound" after received damage.
 	* Return type:      void
-	* Params:           (const this)
+	* Params:           (const this, lastHitGroup, bool:hasArmour)
 	*/
 	RG_CBasePlayer_Pain,
 
 	/*
 	* Description:      Called when a client emits a "death sound" after death.
 	* Return type:      void
-	* Params:           (const this, lastHitGroup, bool:hasArmour)
+	* Params:           (const this)
 	*/
 	RG_CBasePlayer_DeathSound,
 
