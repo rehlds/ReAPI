@@ -1245,3 +1245,154 @@ native rg_send_death_message(const pKiller, const pVictim, const pAssister, cons
 * @noreturn
 */
 native rg_player_takedamage_impulse(const player, const attacker, const Float:flKnockbackForce, const Float:flVelModifier);
+
+/*
+* Restarts entities with the specified classname.
+*
+* @param classname             Classname to search for
+*
+* @noreturn
+*/
+native rg_restart_other(const classname[]);
+
+/*
+* Resets all entities to their original state.
+*
+* @noreturn
+*/
+native rg_reset_entities();
+
+/*
+* Removes entities matching the given classname, optionally limited to a specified number of entities.
+*
+* @param classname             Classname to search for
+* @param removeCount           Remove count
+*
+* @noreturn
+*/
+native rg_remove_other(const classname[], const removeCount = 0);
+
+/*
+* Generates a random long integer within a specified range.
+*
+* @param seed                  Seed
+* @param low                   Low
+* @param high                  High
+*
+* @return                      A random long integer between "low" and "high" (inclusive)
+*/
+native rg_shared_random_long(const seed, const low, const high);
+
+/*
+* Generates a random float within a specified range.
+*
+* @param seed                  Seed
+* @param low                   Low
+* @param high                  High
+*
+* @return                      A random float between "low" and "high" (inclusive)
+*/
+native Float:rg_shared_random_float(const seed, const Float:low, const Float:high);
+
+/*
+* Sets the group trace mask and operation.
+*
+* @param groupmask             Group Mask
+* @param op                    Operation
+*
+* @noreturn
+*/
+native rg_set_group_trace(const groupmask, const op);
+
+/*
+* Resets the group trace mask to its default state.
+*
+* @noreturn
+*/
+native rg_unset_group_trace();
+
+/*
+* Creates a screen shake effect for players within a specified radius.
+*
+* @param vecCenter             Center
+* @param amplitude             Amplitude
+* @param frequency             Frequency
+* @param duration              Duration
+* @param radius                Radius
+*
+* @noreturn
+*/
+native rg_screen_shake(Float:vecCenter[3], const Float:amplitude, const Float:frequency, const Float:duration, const Float:radius);
+
+/*
+* Fades the screen for all players.
+*
+* @param vecColor              Color
+* @param fadeTime              Fade Time
+* @param fadeHold              Fade Hold
+* @param alpha                 Alpha
+* @param flags                 Flags
+*
+* @noreturn
+*/
+native rg_screen_fade_all(Float:vecColor[3], const Float:fadeTime, const Float:fadeHold, const alpha, const flags);
+
+/*
+* Fades the screen for a specific player.
+*
+* @param index                 Client index
+* @param vecColor              Color
+* @param fadeTime              Fade Time
+* @param fadeHold              Fade Hold
+* @param alpha                 Alpha
+* @param flags                 Flags
+*
+* @noreturn
+*/
+native rg_screen_fade(const index, Float:vecColor[3], const Float:fadeTime, const Float:fadeHold = 0.0, const alpha = 0, const flags = 0);
+
+/*
+* Gets the water level at a specific position.
+*
+* @param position              Entity index
+* @param minz                  Min Z
+* @param maxz                  Max Z
+*
+* @return                      The Z coordinate of the water surface
+*/
+native Float:rg_water_level(Float:position[3], const Float:minz, const Float:maxz);
+
+/*
+* Creates bubbles within a specified area.
+*
+* @param vecMins               Mins
+* @param vecMaxs               Maxs
+* @param bubbleCount           Bubble Count
+*
+* @noreturn
+*/
+native rg_bubbles(Float:vecMins[3], Float:vecMaxs[3], const bubbleCount);
+
+/*
+* Creates a trail of bubbles between two points.
+*
+* @param from                  Start position
+* @param to                    End position
+* @param bubbleCount           Bubble Count
+*
+* @noreturn
+*/
+native rg_bubble_trail(Float:from[3], Float:to[3], const bubbleCount);
+
+/*
+* Retrieves the texture type hit by a traceresult, based on start and end positions.
+*
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param vecSrc                Start position
+* @param vecEnd                End position
+* @param output                Buffer to copy the texture type
+* @param len                   Maximum buffer size
+*
+* @noreturn
+*/
+native rg_texture_hit(const ptr, Float:vecSrc[3], Float:vecEnd[3], output[], len);
