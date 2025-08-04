@@ -1272,6 +1272,12 @@ enum GamedllFunc_CSGameRules
 	* Params:           (const pKiller, const pVictim, const pAssister, const pevInflictor, const killerWeaponName[], const DeathMessageFlags:iDeathMessageFlags, const KillRarity:iRarityOfKill)
 	*/
 	RG_CSGameRules_SendDeathMessage,
+
+	/*
+	* Description:      Called when a player picks up an item.
+	* Params:           (const pPlayer, const pItem)
+	*/
+	RG_CSGameRules_PlayerGotItem,
 };
 
 /**
