@@ -301,7 +301,7 @@ jobs:
           
           # Pack and sign final archive
           7z a -tzip reapi-bin-${{ needs.linux.outputs.app-version }}.zip addons/
-          sign_file "reapi-bin-${{ env.APP_VERSION }}.zip"
+          sign_file "reapi-bin-${{ needs.linux.outputs.app-version }}.zip"
 
       - name: Publish artifacts
         uses: softprops/action-gh-release@v2
