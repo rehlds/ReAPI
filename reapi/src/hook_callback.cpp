@@ -1319,7 +1319,7 @@ CWeaponBox *CreateWeaponBox(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem 
 		return indexOfPDataAmx(chain->callNext(getPrivate<CBasePlayerItem>(_pItem), getPrivate<CBasePlayer>(_pPlayerOwner), _modelName, vecOriginCopy, vecAnglesCopy, vecVelocityCopy, _lifeTime, _packAmmo));
 	};
 
-	return getPrivate<CWeaponBox>(callForward<size_t>(RG_CreateWeaponBox, original, indexOfEdictAmx(pItem->pev), indexOfEdictAmx(pPlayerOwner->pev), modelName, getAmxVector(vecOriginCopy), getAmxVector(vecAnglesCopy), getAmxVector(vecVelocityCopy), lifeTime, packAmmo));
+	return getPrivate<CWeaponBox>(callForward<size_t>(RG_CreateWeaponBox, original, indexOfPDataAmx(pItem), indexOfPDataAmx(pPlayerOwner), modelName, getAmxVector(vecOriginCopy), getAmxVector(vecAnglesCopy), getAmxVector(vecVelocityCopy), lifeTime, packAmmo));
 }
 
 CGib *SpawnHeadGib(IReGameHook_SpawnHeadGib *chain, entvars_t *pevVictim)

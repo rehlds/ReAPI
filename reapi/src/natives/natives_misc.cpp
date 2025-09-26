@@ -2691,7 +2691,7 @@ cell AMX_NATIVE_CALL rg_spawn_grenade(AMX* amx, cell* params)
 * Spawn a weaponbox entity with its properties
 *
 * @param pItem                 Weapon entity index to attach
-* @param pPlayerOwner          Player index to remove pItem entity (0 = no weapon owner)
+* @param pPlayerOwner          Player index to remove pItem entity (AMX_NULLENT = no weapon owner)
 * @param modelName             Model name ("models/w_*.mdl")
 * @param origin                Weaponbox origin position
 * @param angles                Weaponbox angles
@@ -2716,7 +2716,7 @@ cell AMX_NATIVE_CALL rg_create_weaponbox(AMX* amx, cell* params)
 
 	CBasePlayer *pPlayer = nullptr;
 
-	if (params[arg_player] != 0)
+	if (params[arg_player] > 0)
 	{
 		CHECK_ISPLAYER(arg_player);
 
