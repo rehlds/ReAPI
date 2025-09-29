@@ -443,7 +443,7 @@ native rg_find_ent_by_class(start_index, const classname[], const bool:useHashTa
 /*
 * Finds an entity in the world using Counter-Strike's custom FindEntityByString wrapper, matching by owner.
 *
-* @param start_index    Entity index to start searching from. AMX_NULLENT (-1) to start from the first entity
+* @param start_index    Entity index to start searching from. NULLENT (-1) to start from the first entity
 * @param classname      Classname to search for
 *
 * @return               true if found, false otherwise
@@ -532,7 +532,7 @@ native rg_remove_all_items(const index, const bool:removeSuit = false);
 * @param index      Client index
 * @param item_name  Item classname, if no name, the active item classname
 *
-* @return           Entity index of weaponbox, AMX_NULLENT (-1) otherwise
+* @return           Entity index of weaponbox, NULLENT (-1) otherwise
 *
 */
 native rg_drop_item(const index, const item_name[]);
@@ -718,7 +718,7 @@ native rg_instant_reload_weapons(const index, const weapon = 0);
 * @param origin     The origin of the bomb where it will be planted.
 * @param angles     The angles of the planted bomb.
 *
-* @return           Index of bomb entity or AMX_NULLENT (-1) otherwise
+* @return           Index of bomb entity or NULLENT (-1) otherwise
 */
 native rg_plant_bomb(const index, Float:vecOrigin[3], Float:vecAngles[3] = {0.0,0.0,0.0});
 
@@ -994,7 +994,7 @@ native bool:rg_get_can_hear_player(const listener, const sender);
 *
 * @param index                 Entity id
 *
-* @return                      Index of head gib entity or AMX_NULLENT (-1) otherwise
+* @return                      Index of head gib entity or NULLENT (-1) otherwise
 */
 native rg_spawn_head_gib(const index);
 
@@ -1020,7 +1020,7 @@ native rg_spawn_random_gibs(const index, const cGibs, const bool:bHuman = true);
 * @param iTeam                 Grenade team, see TEAM_* constants
 * @param usEvent               Event index related to grenade (returned value of precache_event)
 *
-* @return                      Entity index on success, AMX_NULLENT (-1) otherwise
+* @return                      Entity index on success, NULLENT (-1) otherwise
 */
 native rg_spawn_grenade(WeaponIdType:weaponId, pevOwner, Float:vecSrc[3], Float:vecThrow[3], Float:time, TeamName:iTeam, usEvent = 0);
 
@@ -1028,7 +1028,7 @@ native rg_spawn_grenade(WeaponIdType:weaponId, pevOwner, Float:vecSrc[3], Float:
 * Spawn a weaponbox entity with its properties
 *
 * @param pItem                 Weapon entity index to attach
-* @param pPlayerOwner          Player index to remove pItem entity (0 = no weapon owner)
+* @param pPlayerOwner          Player index to remove pItem entity (NULLENT = no weapon owner)
 * @param modelName             Model name ("models/w_*.mdl")
 * @param origin                Weaponbox origin position
 * @param angles                Weaponbox angles
@@ -1036,7 +1036,7 @@ native rg_spawn_grenade(WeaponIdType:weaponId, pevOwner, Float:vecSrc[3], Float:
 * @param lifeTime              Time to stay in world (< 0.0 = use mp_item_staytime cvar value)
 * @param packAmmo              Set if ammo should be removed from weapon owner
 *
-* @return                      Weaponbox ent index on success, AMX_NULLENT (-1) otherwise
+* @return                      Weaponbox ent index on success, NULLENT (-1) otherwise
 */
 native rg_create_weaponbox(const pItem, const pPlayerOwner, const modelName[], Float:origin[3], Float:angles[3], Float:velocity[3], Float:lifeTime, bool:packAmmo);
 
