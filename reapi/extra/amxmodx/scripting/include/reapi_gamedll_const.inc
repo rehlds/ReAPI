@@ -39,6 +39,7 @@
 	#define RG_CBasePlayerWeapon_DefaultShotgunReload RG_CBaseWeapon_DefShotgunReload
 	#define RG_CBasePlayer_Observer_SetMode RG_CBasePlayer_Observer_SetMod
 	#define RG_CBasePlayer_Observer_FindNextPlayer RG_CBasePlayer_Observer_FindNxt
+	#define RG_CSGameRules_PlayerRelationship RG_CSGameRules_PlayerRelation
 #endif
 
 /**
@@ -1272,6 +1273,13 @@ enum GamedllFunc_CSGameRules
 	* Params:           (const pKiller, const pVictim, const pAssister, const pevInflictor, const killerWeaponName[], const DeathMessageFlags:iDeathMessageFlags, const KillRarity:iRarityOfKill)
 	*/
 	RG_CSGameRules_SendDeathMessage,
+	
+	/*
+	* Description:      What is the player's relationship with this entity?
+	* Return type:      int
+	* Params:           (const pPlayer, const pEntity)
+	*/
+	RG_CSGameRules_PlayerRelationship,
 };
 
 /**
