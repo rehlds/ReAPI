@@ -1586,3 +1586,20 @@ enum KillRarity
 	KILLRARITY_REVENGE          = 0x100, // Revenge by the killer
 	KILLRARITY_INAIR            = 0x200  // Killer was in the air (skill to deal with high inaccuracy)
 };
+
+/**
+* Texture types
+*/
+#define CHAR_TEX_CONCRETE               'C'
+#define CHAR_TEX_METAL                  'M'
+#define CHAR_TEX_DIRT                   'D'
+#define CHAR_TEX_VENT                   'V'
+#define CHAR_TEX_GRATE                  'G'
+#define CHAR_TEX_TILE                   'T'
+#define CHAR_TEX_SLOSH                  'S'
+#define CHAR_TEX_WOOD                   'W'
+#define CHAR_TEX_COMPUTER               'P'
+#define CHAR_TEX_GRASS                  'X'
+#define CHAR_TEX_GLASS                  'Y'
+#define CHAR_TEX_FLESH                  'F'
+#define CHAR_TEX_SNOW                   'N'

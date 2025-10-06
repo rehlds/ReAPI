@@ -3416,6 +3416,267 @@ cell AMX_NATIVE_CALL rg_player_takedamage_impulse(AMX *amx, cell *params)
 	return TRUE;
 }
 
+/*
+* Restarts entities with the specified classname.
+*
+* @param classname             Classname to search for
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_restart_other(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_classname };
+
+	char classname[256];
+	const char* value = getAmxString(amx, params[arg_classname], classname);
+
+	g_ReGameFuncs->UTIL_RestartOther(value);
+	return TRUE;
+}
+
+/*
+* Resets all entities to their original state.
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_reset_entities(AMX* amx, cell* params)
+{
+	g_ReGameFuncs->UTIL_ResetEntities();
+	return TRUE;
+}
+
+/*
+* Removes entities matching the given classname, optionally limited to a specified number of entities.
+*
+* @param classname             Classname to search for
+* @param removeCount           Remove count
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_remove_other(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_classname, arg_removeCount };
+
+	char classname[256];
+	const char* value = getAmxString(amx, params[arg_classname], classname);
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_RemoveOther(value, args[arg_removeCount]);
+	return TRUE;
+}
+
+/*
+* Generates a random long integer within a specified range.
+*
+* @param seed                  Seed
+* @param low                   Low
+* @param high                  High
+*
+* @return                      A random long integer between "low" and "high" (inclusive)
+*/
+cell AMX_NATIVE_CALL rg_shared_random_long(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_seed, arg_low, arg_high };
+
+	CAmxArgs args(amx, params);
+	return g_ReGameFuncs->UTIL_SharedRandomLong(args[arg_seed], args[arg_low], args[arg_high]);
+}
+
+/*
+* Generates a random float within a specified range.
+*
+* @param seed                  Seed
+* @param low                   Low
+* @param high                  High
+*
+* @return                      A random float between "low" and "high" (inclusive)
+*/
+cell AMX_NATIVE_CALL rg_shared_random_float(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_seed, arg_low, arg_high };
+
+	CAmxArgs args(amx, params);
+	return g_ReGameFuncs->UTIL_SharedRandomFloat(args[arg_seed], args[arg_low], args[arg_high]);
+}
+
+/*
+* Sets the group trace mask and operation.
+*
+* @param groupmask             Group Mask
+* @param op                    Operation
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_set_group_trace(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_groupmask, arg_op };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_SetGroupTrace(args[arg_groupmask], args[arg_op]);
+	return TRUE;
+}
+
+/*
+* Resets the group trace mask to its default state.
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_unset_group_trace(AMX* amx, cell* params)
+{
+	g_ReGameFuncs->UTIL_UnsetGroupTrace();
+	return TRUE;
+}
+
+/*
+* Creates a screen shake effect for players within a specified radius.
+*
+* @param vecCenter             Center
+* @param amplitude             Amplitude
+* @param frequency             Frequency
+* @param duration              Duration
+* @param radius                Radius
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_screen_shake(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_center, arg_amplitude, arg_frequency, arg_duration, arg_radius };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_ScreenShake(args[arg_center], args[arg_amplitude], args[arg_frequency], args[arg_duration], args[arg_radius]);
+	return TRUE;
+}
+
+/*
+* Fades the screen for all players.
+*
+* @param vecColor              Color
+* @param fadeTime              Fade Time
+* @param fadeHold              Fade Hold
+* @param alpha                 Alpha
+* @param flags                 Flags
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_screen_fade_all(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_color, arg_fadeTime, arg_fadeHold, arg_alpha, arg_flags };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_ScreenFadeAll(args[arg_color], args[arg_fadeTime], args[arg_fadeHold], args[arg_alpha], args[arg_flags]);
+	return TRUE;
+}
+
+/*
+* Fades the screen for a specific player.
+*
+* @param index                 Client index
+* @param vecColor              Color
+* @param fadeTime              Fade Time
+* @param fadeHold              Fade Hold
+* @param alpha                 Alpha
+* @param flags                 Flags
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_screen_fade(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_entity, arg_color, arg_fadeTime, arg_fadeHold, arg_alpha, arg_flags };
+
+	CBaseEntity* pEntity = getPrivate<CBaseEntity>(params[arg_entity]);
+	CHECK_CONNECTED(pEntity, arg_entity);
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_ScreenFade(args[arg_entity], args[arg_color], args[arg_fadeTime], args[arg_fadeHold], args[arg_alpha], args[arg_flags]);
+	return TRUE;
+}
+
+/*
+* Gets the water level at a specific position.
+*
+* @param position              Entity index
+* @param minz                  Min Z
+* @param maxz                  Max Z
+*
+* @return                      The Z coordinate of the water surface
+*/
+cell AMX_NATIVE_CALL rg_water_level(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_position, arg_minz, arg_maxz };
+
+	CAmxArgs args(amx, params);
+	return g_ReGameFuncs->UTIL_WaterLevel(args[arg_position], args[arg_minz], args[arg_maxz]);
+}
+
+/*
+* Creates bubbles within a specified area.
+*
+* @param vecMins               Mins
+* @param vecMaxs               Maxs
+* @param bubbleCount           Bubble Count
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_bubbles(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_mins, arg_maxs, arg_bubbleCount };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_Bubbles(args[arg_mins], args[arg_maxs], args[arg_bubbleCount]);
+	return TRUE;
+}
+
+/*
+* Creates a trail of bubbles between two points.
+*
+* @param from                  Start position
+* @param to                    End position
+* @param bubbleCount           Bubble Count
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_bubble_trail(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_from, arg_to, arg_bubbleCount };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_BubbleTrail(args[arg_from], args[arg_to], args[arg_bubbleCount]);
+	return TRUE;
+}
+
+/*
+* Retrieves the texture type hit by a traceresult, based on start and end positions.
+*
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param vecSrc                Start position
+* @param vecEnd                End position
+* @param output                Buffer to copy the texture type
+* @param len                   Maximum buffer size
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_texture_hit(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_trace, arg_src, arg_end, arg_output, arg_maxlen };
+
+	CAmxArgs args(amx, params);
+
+	cell* dest = getAmxAddr(amx, params[arg_output]);
+	size_t length = *getAmxAddr(amx, params[arg_maxlen]);
+	const char textureType = g_ReGameFuncs->UTIL_TextureHit(args[arg_trace], args[arg_src], args[arg_end]);
+
+	if (textureType == '\0')
+	{
+		setAmxString(dest, "", 1);
+		return TRUE;
+	}
+
+	const char buffer[2] = { textureType, '\0' };
+	setAmxString(dest, buffer, length);
+
+	return TRUE;  
+}
+
 AMX_NATIVE_INFO Misc_Natives_RG[] =
 {
 	{ "rg_set_animation",             rg_set_animation             },
@@ -3532,6 +3793,21 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 
 	{ "rg_send_death_message",        rg_send_death_message        },
 	{ "rg_player_takedamage_impulse", rg_player_takedamage_impulse },
+
+	{ "rg_restart_other",             rg_restart_other             },
+	{ "rg_reset_entities",            rg_reset_entities            },
+	{ "rg_remove_other",              rg_remove_other              },
+	{ "rg_shared_random_long",        rg_shared_random_long        },
+	{ "rg_shared_random_float",       rg_shared_random_float       },
+	{ "rg_set_group_trace",           rg_set_group_trace           },
+	{ "rg_unset_group_trace",         rg_unset_group_trace         },
+	{ "rg_screen_shake",              rg_screen_shake              },
+	{ "rg_screen_fade_all",           rg_screen_fade_all           },
+	{ "rg_screen_fade",               rg_screen_fade               },
+	{ "rg_water_level",               rg_water_level               },
+	{ "rg_bubbles",                   rg_bubbles                   },
+	{ "rg_bubble_trail",              rg_bubble_trail              },
+	{ "rg_texture_hit",               rg_texture_hit               },
 
 	{ nullptr, nullptr }
 };
