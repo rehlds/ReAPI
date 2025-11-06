@@ -3416,6 +3416,60 @@ cell AMX_NATIVE_CALL rg_player_takedamage_impulse(AMX *amx, cell *params)
 	return TRUE;
 }
 
+/*
+* Fires a trace line between two origins, retrieving the end point and entity hit.
+*
+* @param vecStart              Start position
+* @param vecEnd                End position
+* @param ignoreMonsters        Entity ignore type
+* @param ignoreEntity          Entity index that trace will ignore, NULLENT if trace should not ignore any entities
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param traceFlags            Additional trace flags, see FTRACE_* constants on cssdk_const.inc
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_trace_line(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_vec_start, arg_vec_end, arg_ignore_monsters, arg_ignore_entity, arg_trace, arg_trace_flags };
+
+	edict_t* pEntityIgnore = edictByIndexAmx(params[arg_ignore_entity]);
+
+	CAmxArgs args(amx, params);
+
+	gpGlobals->trace_flags = args[arg_trace_flags];
+	g_pengfuncsTable->pfnTraceLine(args[arg_vec_start], args[arg_vec_end], args[arg_ignore_monsters], pEntityIgnore, args[arg_trace]);
+
+	return TRUE;
+}
+
+/*
+* Fires a trace hull on a specified origin or between two origins.
+*
+* @param vecStart              Start position
+* @param vecEnd                End position
+* @param ignoreMonsters        Entity ignore type
+* @param hullNumber            Hull type
+* @param ignoreEntity          Entity index that trace will ignore, NULLENT if trace should not ignore any entities
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param traceFlags            Additional trace flags, see FTRACE_* constants on cssdk_const.inc
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_trace_hull(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_vec_start, arg_vec_end, arg_ignore_monsters, arg_hull_number, arg_ignore_entity, arg_trace, arg_trace_flags };
+
+	edict_t* pEntityIgnore = edictByIndexAmx(params[arg_ignore_entity]);
+
+	CAmxArgs args(amx, params);
+
+	gpGlobals->trace_flags = args[arg_trace_flags];
+	g_pengfuncsTable->pfnTraceHull(args[arg_vec_start], args[arg_vec_end], args[arg_ignore_monsters], args[arg_hull_number], pEntityIgnore, args[arg_trace]);
+	gpGlobals->trace_flags = 0;
+
+	return TRUE;
+}
+
 AMX_NATIVE_INFO Misc_Natives_RG[] =
 {
 	{ "rg_set_animation",             rg_set_animation             },
@@ -3532,6 +3586,8 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 
 	{ "rg_send_death_message",        rg_send_death_message        },
 	{ "rg_player_takedamage_impulse", rg_player_takedamage_impulse },
+	{ "rg_trace_line",                rg_trace_line                },
+	{ "rg_trace_hull",                rg_trace_hull                },
 
 	{ nullptr, nullptr }
 };

@@ -1245,3 +1245,32 @@ native rg_send_death_message(const pKiller, const pVictim, const pAssister, cons
 * @noreturn
 */
 native rg_player_takedamage_impulse(const player, const attacker, const Float:flKnockbackForce, const Float:flVelModifier);
+
+/*
+* Fires a trace line between two origins, retrieving the end point and entity hit.
+*
+* @param vecStart              Start position
+* @param vecEnd                End position
+* @param ignoreMonsters        Entity ignore type
+* @param ignoreEntity          Entity index that trace will ignore, NULLENT if trace should not ignore any entities
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param traceFlags            Additional trace flags, see FTRACE_* constants on cssdk_const.inc
+*
+* @noreturn
+*/
+native rg_trace_line(Float:vecStart[3], Float:vecEnd[3], const ignoreMonsters, const ignoreEntity, const ptr, const traceFlags = 0);
+
+/*
+* Fires a trace hull on a specified origin or between two origins.
+*
+* @param vecStart              Start position
+* @param vecEnd                End position
+* @param ignoreMonsters        Entity ignore type
+* @param hullNumber            Hull type
+* @param ignoreEntity          Entity index that trace will ignore, NULLENT if trace should not ignore any entities
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param traceFlags            Additional trace flags, see FTRACE_* constants on cssdk_const.inc
+*
+* @noreturn
+*/
+native rg_trace_hull(Float:vecStart[3], Float:vecEnd[3], const ignoreMonsters, const hullNumber, const ignoreEntity, const ptr, const traceFlags = 0);
