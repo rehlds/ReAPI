@@ -1786,6 +1786,16 @@ void CBasePlayer_TakeDamageImpulse(IReGameHook_CBasePlayer_TakeDamageImpulse *ch
 	callVoidForward(RG_CBasePlayer_TakeDamageImpulse, original, indexOfEdict(pthis->pev), indexOfEdict(pAttacker->pev), flKnockbackForce, flVelModifier);
 }
 
+int CSGameRules_PlayerRelationship(IReGameHook_CSGameRules_PlayerRelationship *chain, CBasePlayer *pPlayer, CBaseEntity *pEntity)
+{
+	auto original = [chain](int _pPlayer, int _pEntity)
+	{
+		return chain->callNext(getPrivate<CBasePlayer>(_pPlayer), getPrivate<CBaseEntity>(_pEntity));
+	};
+
+	return callForward(RG_CSGameRules_PlayerRelationship, original, indexOfEdict(pPlayer->pev), indexOfEdict(pEntity->pev));
+}
+
 /*
 * VTC functions
 */
