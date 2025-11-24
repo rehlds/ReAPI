@@ -369,6 +369,7 @@ public:
 	bool IsProtectedByShield() { return m_bOwnsShield && m_bShieldDrawn; }
 	bool IsReloading() const;
 	bool IsBlind() const { return (m_blindUntilTime > gpGlobals->time); }
+	bool IsFullyBlind(const float flPeekTime = 0.6f) const { return m_blindAlpha >= 255 && m_blindFadeTime > (flPeekTime * 2.0f) && (m_blindStartTime + m_blindHoldTime + flPeekTime) > gpGlobals->time; }
 	bool IsAutoFollowAllowed() const { return (gpGlobals->time > m_allowAutoFollowTime); }
 	void InhibitAutoFollow(float duration) { m_allowAutoFollowTime = gpGlobals->time + duration; }
 	void AllowAutoFollow() { m_allowAutoFollowTime = 0; }
