@@ -96,12 +96,96 @@ cell AMX_NATIVE_CALL REU_IsRevemuWithoutAdminRights(AMX *amx, cell *params)
 	return TRUE;
 }
 
+cell AMX_NATIVE_CALL REU_GetAuthKeyKind(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index };
+
+	CHECK_ISPLAYER(arg_index);
+
+	return g_ReunionApi->GetAuthKeyKind(params[arg_index] - 1);
+}
+
+cell AMX_NATIVE_CALL REU_SetConnectTime(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_time };
+
+	CHECK_ISPLAYER(arg_index);
+
+	int clientId = params[arg_index] - 1;
+
+	g_ReunionApi->SetConnectTime(clientId, arg_time);
+	
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL REU_GetSerializedId(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_type, arg_authid };
+
+	CHECK_ISPLAYER(arg_index);
+
+	int clientId = params[arg_index] - 1;
+
+	USERID_t *serializedId = g_ReunionApi->GetSerializedId(clientId);
+
+	if (!serializedId)
+		return FALSE;
+
+	*getAmxAddr(amx, params[arg_type]) = serializedId->idtype;
+
+	cell* dest = getAmxAddr(amx, params[arg_authid]);
+	char buffer[MAX_STEAMIDSALTLEN];
+	Q_memcpy(buffer, &serializedId->m_SteamID, sizeof(uint64));
+
+	setAmxString(dest, buffer, MAX_STEAMIDSALTLEN);
+
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL REU_GetStorageId(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_type, arg_authid };
+
+	CHECK_ISPLAYER(arg_index);
+
+	int clientId = params[arg_index] - 1;
+
+	USERID_t* serializedId = g_ReunionApi->GetStorageId(clientId);
+
+	if (!serializedId)
+		return FALSE;
+
+	*getAmxAddr(amx, params[arg_type]) = serializedId->idtype;
+
+	cell* dest = getAmxAddr(amx, params[arg_authid]);
+	char buffer[MAX_STEAMIDSALTLEN];
+	Q_memcpy(buffer, &serializedId->m_SteamID, sizeof(uint64));
+
+	setAmxString(dest, buffer, MAX_STEAMIDSALTLEN);
+
+	return TRUE;
+}
+
+cell AMX_NATIVE_CALL REU_GetDisplaySteamId(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_time };
+
+	CHECK_ISPLAYER(arg_index);
+
+	return g_ReunionApi->GetDisplaySteamId(params[arg_index] - 1);
+}
+
 AMX_NATIVE_INFO Reunion_Natives[] =
 {
 	{ "REU_GetProtocol",                REU_GetProtocol                },
 	{ "REU_GetAuthtype",                REU_GetAuthtype                },
 	{ "REU_GetAuthKey",                 REU_GetAuthKey                 },
 	{ "REU_IsRevemuWithoutAdminRights", REU_IsRevemuWithoutAdminRights },
+	{ "REU_GetAuthKeyKind",				REU_GetAuthKeyKind			   },
+	{ "REU_SetConnectTime",				REU_SetConnectTime             },
+	{ "REU_GetSerializedId",			REU_GetSerializedId            },
+	{ "REU_GetStorageId",				REU_GetStorageId               },
+	{ "REU_GetDisplaySteamId",			REU_GetDisplaySteamId          },
 
 	{ nullptr, nullptr }
 };

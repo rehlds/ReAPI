@@ -2076,16 +2076,18 @@ cell AMX_NATIVE_CALL rg_send_bartime2(AMX *amx, cell *params)
 	CHECK_CONNECTED(pPlayer, arg_index);
 
 	CAmxArgs args(amx, params);
+	int duration = args[arg_time];
 	float startPercent = args[arg_start_percent];
 	if (!args[arg_observer]) {
 		EMESSAGE_BEGIN(MSG_ONE_UNRELIABLE, gmsgBarTime2, nullptr, pPlayer->edict());
-			EWRITE_SHORT(args[arg_time]);
+			EWRITE_SHORT(duration);
 			EWRITE_SHORT(startPercent);
 		EMESSAGE_END();
 		return TRUE;
 	}
 
-	pPlayer->CSPlayer()->SetProgressBarTime2(args[arg_time], startPercent);
+	float timeElapsed = (startPercent / 100.0f) * duration;
+	pPlayer->CSPlayer()->SetProgressBarTime2(duration, timeElapsed);
 	return TRUE;
 }
 
@@ -2689,7 +2691,7 @@ cell AMX_NATIVE_CALL rg_spawn_grenade(AMX* amx, cell* params)
 * Spawn a weaponbox entity with its properties
 *
 * @param pItem                 Weapon entity index to attach
-* @param pPlayerOwner          Player index to remove pItem entity (0 = no weapon owner)
+* @param pPlayerOwner          Player index to remove pItem entity (AMX_NULLENT = no weapon owner)
 * @param modelName             Model name ("models/w_*.mdl")
 * @param origin                Weaponbox origin position
 * @param angles                Weaponbox angles
@@ -2714,7 +2716,7 @@ cell AMX_NATIVE_CALL rg_create_weaponbox(AMX* amx, cell* params)
 
 	CBasePlayer *pPlayer = nullptr;
 
-	if (params[arg_player] != 0)
+	if (params[arg_player] > 0)
 	{
 		CHECK_ISPLAYER(arg_player);
 
@@ -3243,6 +3245,34 @@ cell AMX_NATIVE_CALL rg_set_observer_mode(AMX* amx, cell* params)
 }
 
 /*
+* Call origin function CBasePlayer::Observer_FindNextPlayer()
+* @note Player must be a valid observer (m_afPhysicsFlags & PFLAG_OBSERVER).
+*
+* @param player                Player index.
+* @param bReverse              If bReverse is true, finding order will be reversed
+* @param name                  Player name to find.
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_observer_find_next_player(AMX* amx, cell* params)
+{
+	enum args_e { arg_count, arg_index, arg_bReverse, arg_name };
+
+	CHECK_ISPLAYER(arg_index)
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	char nameBuf[MAX_PLAYER_NAME_LENGTH];
+	const char* name = getAmxString(amx, params[arg_name], nameBuf);
+	if (strcmp(name, "") == 0)
+		name = nullptr;
+
+	pPlayer->CSPlayer()->Observer_FindNextPlayer(params[arg_bReverse] != 0, name);
+	return TRUE;
+}
+
+/*
 * Emits a death notice (logs, DeathMsg event, win conditions check)
 *
 * @param pVictim               Player index.
@@ -3342,6 +3372,101 @@ cell AMX_NATIVE_CALL rg_send_death_message(AMX *amx, cell *params)
 	const char *weaponName = getAmxString(amx, params[arg_weaponname], weaponStr);
 
 	CSGameRules()->SendDeathMessage(pKiller, pVictim, pAssister, args[arg_inflictor], weaponName, args[arg_deathmsgflags], args[arg_rarityofkill]);
+	return TRUE;
+}
+
+/*
+* Adds impulse to the player.
+*
+* @param player                 Player index.
+* @param attacker               Attacker index.
+* @param flKnockbackForce       Knockback force.
+* @param flVelModifier          Velocity modifier.
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_player_takedamage_impulse(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_attacker, arg_knockback_force, arg_vel_modifier };
+
+	CHECK_ISPLAYER(arg_index);
+	CHECK_ISPLAYER(arg_attacker);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	if (!pPlayer->IsAlive())
+	{
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: player %d not alive", __FUNCTION__, params[arg_index]);
+		return FALSE;
+	}
+
+	CBasePlayer *pAttacker = UTIL_PlayerByIndex(params[arg_attacker]);
+	CHECK_CONNECTED(pAttacker, arg_attacker);
+
+	if (!pAttacker->IsAlive())
+	{
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: attacker %d not alive", __FUNCTION__, params[arg_attacker]);
+		return FALSE;
+	}
+
+	CAmxArgs args(amx, params);
+	pPlayer->CSPlayer()->TakeDamageImpulse(pAttacker, args[arg_knockback_force], args[arg_vel_modifier]);
+
+	return TRUE;
+}
+
+/*
+* Fires a trace line between two origins, retrieving the end point and entity hit.
+*
+* @param vecStart              Start position
+* @param vecEnd                End position
+* @param ignoreMonsters        Entity ignore type
+* @param ignoreEntity          Entity index that trace will ignore, NULLENT if trace should not ignore any entities
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param traceFlags            Additional trace flags, see FTRACE_* constants on cssdk_const.inc
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_trace_line(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_vec_start, arg_vec_end, arg_ignore_monsters, arg_ignore_entity, arg_trace, arg_trace_flags };
+
+	edict_t* pEntityIgnore = edictByIndexAmx(params[arg_ignore_entity]);
+
+	CAmxArgs args(amx, params);
+
+	gpGlobals->trace_flags = args[arg_trace_flags];
+	g_pengfuncsTable->pfnTraceLine(args[arg_vec_start], args[arg_vec_end], args[arg_ignore_monsters], pEntityIgnore, args[arg_trace]);
+
+	return TRUE;
+}
+
+/*
+* Fires a trace hull on a specified origin or between two origins.
+*
+* @param vecStart              Start position
+* @param vecEnd                End position
+* @param ignoreMonsters        Entity ignore type
+* @param hullNumber            Hull type
+* @param ignoreEntity          Entity index that trace will ignore, NULLENT if trace should not ignore any entities
+* @param ptr                   Traceresult pointer, use Fakemeta's create_tr2 to instantiate one
+* @param traceFlags            Additional trace flags, see FTRACE_* constants on cssdk_const.inc
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_trace_hull(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_vec_start, arg_vec_end, arg_ignore_monsters, arg_hull_number, arg_ignore_entity, arg_trace, arg_trace_flags };
+
+	edict_t* pEntityIgnore = edictByIndexAmx(params[arg_ignore_entity]);
+
+	CAmxArgs args(amx, params);
+
+	gpGlobals->trace_flags = args[arg_trace_flags];
+	g_pengfuncsTable->pfnTraceHull(args[arg_vec_start], args[arg_vec_end], args[arg_ignore_monsters], args[arg_hull_number], pEntityIgnore, args[arg_trace]);
+	gpGlobals->trace_flags = 0;
+
 	return TRUE;
 }
 
@@ -3455,10 +3580,14 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_switch_best_weapon",        rg_switch_best_weapon        },
 	{ "rg_disappear",                 rg_disappear                 },
 	{ "rg_set_observer_mode",         rg_set_observer_mode         },
+	{ "rg_observer_find_next_player", rg_observer_find_next_player },
 	{ "rg_death_notice",              rg_death_notice              },
 	{ "rg_player_relationship",       rg_player_relationship       },
 
 	{ "rg_send_death_message",        rg_send_death_message        },
+	{ "rg_player_takedamage_impulse", rg_player_takedamage_impulse },
+	{ "rg_trace_line",                rg_trace_line                },
+	{ "rg_trace_hull",                rg_trace_hull                },
 
 	{ nullptr, nullptr }
 };
@@ -3730,6 +3859,34 @@ cell AMX_NATIVE_CALL rh_is_entity_fullpacked(AMX *amx, cell *params)
 	return FALSE;
 }
 
+/*
+* Checks if server paused
+*
+* @return           Returns true if paused, otherwise false.
+*
+* native bool:rh_is_server_paused();
+*/
+cell AMX_NATIVE_CALL rh_is_server_paused(AMX *amx, cell *params)
+{
+	return g_RehldsData->IsPaused() ? TRUE : FALSE;
+}
+
+/*
+* Set server pause state
+*
+* @param st    pause state
+*
+* @noreturn
+*
+* native rh_set_server_pause(const bool:status);
+*/
+cell AMX_NATIVE_CALL rh_set_server_pause(AMX *amx, cell *params)
+{
+	enum { arg_count, arg_status };
+	g_RehldsFuncs->SetServerPause(params[arg_status] != 0);
+	return TRUE;
+}
+
 AMX_NATIVE_INFO Misc_Natives_RH[] =
 {
 	{ "rh_set_mapname",             rh_set_mapname             },
@@ -3742,6 +3899,8 @@ AMX_NATIVE_INFO Misc_Natives_RH[] =
 	{ "rh_get_realtime",            rh_get_realtime            },
 	{ "rh_is_entity_fullpacked",    rh_is_entity_fullpacked    },
 	{ "rh_get_client_connect_time", rh_get_client_connect_time },
+	{ "rh_is_server_paused",        rh_is_server_paused        },
+	{ "rh_set_server_pause",        rh_set_server_pause        },
 
 	{ nullptr, nullptr }
 };

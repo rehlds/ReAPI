@@ -1319,7 +1319,7 @@ CWeaponBox *CreateWeaponBox(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem 
 		return indexOfPDataAmx(chain->callNext(getPrivate<CBasePlayerItem>(_pItem), getPrivate<CBasePlayer>(_pPlayerOwner), _modelName, vecOriginCopy, vecAnglesCopy, vecVelocityCopy, _lifeTime, _packAmmo));
 	};
 
-	return getPrivate<CWeaponBox>(callForward<size_t>(RG_CreateWeaponBox, original, indexOfEdictAmx(pItem->pev), indexOfEdictAmx(pPlayerOwner->pev), modelName, getAmxVector(vecOriginCopy), getAmxVector(vecAnglesCopy), getAmxVector(vecVelocityCopy), lifeTime, packAmmo));
+	return getPrivate<CWeaponBox>(callForward<size_t>(RG_CreateWeaponBox, original, indexOfPDataAmx(pItem), indexOfPDataAmx(pPlayerOwner), modelName, getAmxVector(vecOriginCopy), getAmxVector(vecAnglesCopy), getAmxVector(vecVelocityCopy), lifeTime, packAmmo));
 }
 
 CGib *SpawnHeadGib(IReGameHook_SpawnHeadGib *chain, entvars_t *pevVictim)
@@ -1766,14 +1766,34 @@ void CSGameRules_SendDeathMessage(IReGameHook_CSGameRules_SendDeathMessage *chai
 	callVoidForward(RG_CSGameRules_SendDeathMessage, original, indexOfPDataAmx(pKiller), indexOfEdict(pVictim->pev), indexOfPDataAmx(pAssister), indexOfEdictAmx(pevInflictor), killerWeaponName, iDeathMessageFlags, iRarityOfKill);
 }
 
-void SendSayMessage(IReGameHook_SendSayMessage *chain, CBasePlayer *pPlayer, BOOL teamonly, char *p, const char *pszFormat, char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
+void CBasePlayer_UpdateStatusBar(IReGameHook_CBasePlayer_UpdateStatusBar *chain, CBasePlayer *pthis)
 {
-	auto original = [chain](int _pPlayer, BOOL _teamonly, char *_p, const char *_pszFormat, char *_pszConsoleFormat, bool _bSenderDead, const char *_placeName, bool _consoleUsesPlaceName)
+	auto original = [chain](int _pthis)
 	{
-		chain->callNext(getPrivate<CBasePlayer>(_pPlayer), _teamonly, _p, _pszFormat, _pszConsoleFormat, _bSenderDead, _placeName, _consoleUsesPlaceName);
+		chain->callNext(getPrivate<CBasePlayer>(_pthis));
+	};
+	
+	callVoidForward(RG_CBasePlayer_UpdateStatusBar, original, indexOfEdict(pthis->pev));
+}
+
+void CBasePlayer_TakeDamageImpulse(IReGameHook_CBasePlayer_TakeDamageImpulse *chain, CBasePlayer *pthis, CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier)
+{
+	auto original = [chain](int _pthis, int _pAttacker, float _flKnockbackForce, float _flVelModifier)
+	{
+		chain->callNext(getPrivate<CBasePlayer>(_pthis), getPrivate<CBasePlayer>(_pAttacker), _flKnockbackForce, _flVelModifier);
+	};
+	
+	callVoidForward(RG_CBasePlayer_TakeDamageImpulse, original, indexOfEdict(pthis->pev), indexOfEdict(pAttacker->pev), flKnockbackForce, flVelModifier);
+}
+
+void SendSayMessage(IReGameHook_SendSayMessage *chain, CBasePlayer *pPlayer, const char *pszCmd, BOOL teamonly, const char *pszText, const char *pszFormat, char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
+{
+	auto original = [chain](int _pPlayer, const char *_pszCmd, BOOL _teamonly, const char *_pszText, const char *_pszFormat, const char *_pszConsoleFormat, bool _bSenderDead, const char *_placeName, bool _consoleUsesPlaceName)
+	{
+		chain->callNext(getPrivate<CBasePlayer>(_pPlayer), _pszCmd, _teamonly, _pszText, _pszFormat, _pszConsoleFormat, _bSenderDead, _placeName, _consoleUsesPlaceName);
 	};
 
-	callVoidForward(RG_SendSayMessage, original, indexOfEdict(pPlayer->pev), teamonly, p, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
+	callVoidForward(RG_SendSayMessage, original, indexOfEdict(pPlayer->pev), pszCmd, teamonly, pszText, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
 }
 
 /*
