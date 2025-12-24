@@ -242,6 +242,7 @@ enum GamedllFunc_CBasePlayer
 	RG_CBasePlayer_RemoveAllItems,
 	RG_CBasePlayer_UpdateStatusBar,
 	RG_CBasePlayer_TakeDamageImpulse,
+	RG_CBasePlayer_HandleSignals,
 
 	// [...]
 };

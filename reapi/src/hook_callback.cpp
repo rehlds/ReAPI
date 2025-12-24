@@ -1786,6 +1786,16 @@ void CBasePlayer_TakeDamageImpulse(IReGameHook_CBasePlayer_TakeDamageImpulse *ch
 	callVoidForward(RG_CBasePlayer_TakeDamageImpulse, original, indexOfEdict(pthis->pev), indexOfEdict(pAttacker->pev), flKnockbackForce, flVelModifier);
 }
 
+void CBasePlayer_HandleSignals(IReGameHook_CBasePlayer_HandleSignals *chain, CBasePlayer *pthis)
+{
+	auto original = [chain](int _pthis)
+	{
+		return chain->callNext(getPrivate<CBasePlayer>(_pthis));
+	};
+
+	callVoidForward(RG_CBasePlayer_HandleSignals, original, indexOfEdict(pthis->pev));
+}
+
 /*
 * VTC functions
 */
