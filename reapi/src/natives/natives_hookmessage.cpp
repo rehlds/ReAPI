@@ -260,7 +260,8 @@ cell AMX_NATIVE_CALL GetMessageData(AMX *amx, cell *params)
 				return FALSE;
 
 			const char *argString = g_activeMessageContext->getParamString(number);
-			setAmxString(dstAddr, argString ? argString : "", params[arg_maxlen]);
+			size_t maxlen = *getAmxAddr(amx, params[arg_maxlen]);
+			setAmxString(dstAddr, argString ? argString : "", maxlen);
 			return TRUE;
 		}
 		case IMessage::ParamType::Angle:
@@ -341,7 +342,8 @@ cell AMX_NATIVE_CALL GetMessageOrigData(AMX *amx, cell *params)
 				return FALSE;
 
 			const char *argString = g_activeMessageContext->getOriginalParamString(number);
-			setAmxString(dstAddr, argString ? argString : "", params[arg_maxlen]);
+			size_t maxlen = *getAmxAddr(amx, params[arg_maxlen]);
+			setAmxString(dstAddr, argString ? argString : "", maxlen);
 			return TRUE;
 		}
 		case IMessage::ParamType::Angle:
