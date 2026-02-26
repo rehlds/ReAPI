@@ -952,6 +952,13 @@ enum GamedllFunc_CBasePlayer
 	* Params:           (const this, attacker, Float:flKnockbackForce, Float:flVelModifier)
 	*/
 	RG_CBasePlayer_TakeDamageImpulse,
+
+	/*
+	* Description:      Called when signals are handled.
+	* Return type:      void
+	* Params:           (const this)
+	*/
+	RG_CBasePlayer_HandleSignals,
 };
 
 /**
