@@ -890,14 +890,14 @@ enum GamedllFunc_CBasePlayer
 	/*
 	* Description:      Called when a client emits a "pain sound" after received damage.
 	* Return type:      void
-	* Params:           (const this)
+	* Params:           (const this, HitBoxGroup:lastHitGroup, bool:hasArmour)
 	*/
 	RG_CBasePlayer_Pain,
 
 	/*
 	* Description:      Called when a client emits a "death sound" after death.
 	* Return type:      void
-	* Params:           (const this, lastHitGroup, bool:hasArmour)
+	* Params:           (const this)
 	*/
 	RG_CBasePlayer_DeathSound,
 
@@ -940,6 +940,18 @@ enum GamedllFunc_CBasePlayer
 	* Params:           (const this, bool:removeSuit)
 	*/
 	RG_CBasePlayer_RemoveAllItems,
+
+	/*
+	* Description:      -
+	* Params:           (const this)
+	*/
+	RG_CBasePlayer_UpdateStatusBar,
+
+	/*
+	* Description:      Called for the victim player after taking damage, when "knockback" and "pain shock" are applied.
+	* Params:           (const this, attacker, Float:flKnockbackForce, Float:flVelModifier)
+	*/
+	RG_CBasePlayer_TakeDamageImpulse,
 };
 
 /**
@@ -1094,7 +1106,7 @@ enum GamedllFunc_CSGameRules
 
 	/*
 	* Description:      Can this player take damage from this attacker?
-	* Return type:      float
+	* Return type:      BOOL
 	* Params:           (const index, const attacker)
 	*/
 	RG_CSGameRules_FPlayerCanTakeDamage,
