@@ -188,7 +188,7 @@ cell AMX_NATIVE_CALL SetMessageData(AMX *amx, cell *params)
 			break;
 		case IMessage::ParamType::Angle:
 		case IMessage::ParamType::Coord:
-			g_activeMessageContext->setParamFloat(number, *(float *)value);
+			g_activeMessageContext->setParamFloat(number, amx_CellToFloat(*value));
 			break;
 		case IMessage::ParamType::Byte:
 		case IMessage::ParamType::Char:
@@ -260,16 +260,18 @@ cell AMX_NATIVE_CALL GetMessageData(AMX *amx, cell *params)
 				return FALSE;
 
 			const char *argString = g_activeMessageContext->getParamString(number);
-			setAmxString(dstAddr, argString ? argString : "", params[arg_maxlen]);
+			size_t maxlen = *getAmxAddr(amx, params[arg_maxlen]);
+			setAmxString(dstAddr, argString ? argString : "", maxlen);
 			return TRUE;
 		}
 		case IMessage::ParamType::Angle:
 		case IMessage::ParamType::Coord:
 		{
-			float flValue = g_activeMessageContext->getParamFloat(number);
+			cell value = amx_FloatToCell(g_activeMessageContext->getParamFloat(number));
 			if (PARAMS_COUNT > 2)
-				*dstAddr = flValue;
-			return flValue;
+				*dstAddr = value;
+
+			return value;
 		}
 		case IMessage::ParamType::Entity:
 		case IMessage::ParamType::Byte:
@@ -340,16 +342,17 @@ cell AMX_NATIVE_CALL GetMessageOrigData(AMX *amx, cell *params)
 				return FALSE;
 
 			const char *argString = g_activeMessageContext->getOriginalParamString(number);
-			setAmxString(dstAddr, argString ? argString : "", params[arg_maxlen]);
+			size_t maxlen = *getAmxAddr(amx, params[arg_maxlen]);
+			setAmxString(dstAddr, argString ? argString : "", maxlen);
 			return TRUE;
 		}
 		case IMessage::ParamType::Angle:
 		case IMessage::ParamType::Coord:
 		{
-			float flValue = g_activeMessageContext->getOriginalParamFloat(number);
+			cell value = amx_FloatToCell(g_activeMessageContext->getOriginalParamFloat(number));
 			if (PARAMS_COUNT > 2)
-				*dstAddr = flValue;
-			return flValue;
+				*dstAddr = value;
+			return value;
 		}
 		case IMessage::ParamType::Entity:
 		case IMessage::ParamType::Byte:

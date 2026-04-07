@@ -5,10 +5,13 @@
 // hookchain return type
 enum HookChainState
 {
-	HC_CONTINUE = 0,	// plugin didn't take any action
-	HC_SUPERCEDE,		// skip real function, use my return value
-	HC_BREAK			// skip all forwards and real function, use my return value
-						// @note Warning: Be very careful using this type of return will skip calls for all following AMXX the plugins.
+	HC_CONTINUE = 0,	// Plugin didn't take any action
+	HC_SUPERCEDE,		// Skip real function, use my return value
+	HC_BREAK,			// Skip all forwards and real function, use my return value
+						// @note Warning: Be very careful using this type of return will skip calls for all following AMXX the plugins
+
+	HC_BYPASS			// Skip calls for all following AMXX plugins, but call the original function
+						// @note Warning: In PRE skips all forwards including POST forwards
 };
 
 // api types
@@ -168,15 +171,17 @@ NOINLINE void DLLEXPORT _callVoidForward(hook_t* hook, original_t original, f_ar
 		if (likely(fwd->GetState() == FSTATE_ENABLED))
 		{
 			hookCtx->SetId(fwd->GetIndex()); // set current handler hook
-			auto ret = g_amxxapi.ExecuteForward(fwd->GetFwdIndex(), std::forward<f_args &&>(args)...);
+			int ret = g_amxxapi.ExecuteForward(fwd->GetFwdIndex(), std::forward<f_args &&>(args)...);
 			hookCtx->ResetId();
 
-			if (unlikely(ret == HC_BREAK)) {
+			if (unlikely(ret == HC_BREAK))
 				return;
-			}
 
 			if (unlikely(ret > hc_state))
 				hc_state = ret;
+
+			if (unlikely(ret == HC_BYPASS))
+				break;
 		}
 	}
 
@@ -187,16 +192,19 @@ NOINLINE void DLLEXPORT _callVoidForward(hook_t* hook, original_t original, f_ar
 		hook->wasCalled = true;
 	}
 
-	for (auto fwd : hook->post)
+	if (hc_state != HC_BYPASS)
 	{
-		if (likely(fwd->GetState() == FSTATE_ENABLED))
+		for (auto fwd : hook->post)
 		{
-			hookCtx->SetId(fwd->GetIndex()); // set current handler hook
-			auto ret = g_amxxapi.ExecuteForward(fwd->GetFwdIndex(), std::forward<f_args &&>(args)...);
-			hookCtx->ResetId();
+			if (likely(fwd->GetState() == FSTATE_ENABLED))
+			{
+				hookCtx->SetId(fwd->GetIndex()); // set current handler hook
+				int ret = g_amxxapi.ExecuteForward(fwd->GetFwdIndex(), std::forward<f_args &&>(args)...);
+				hookCtx->ResetId();
 
-			if (unlikely(ret == HC_BREAK))
-				break;
+				if (unlikely(ret == HC_BREAK || ret == HC_BYPASS))
+					break;
+			}
 		}
 	}
 
@@ -568,6 +576,8 @@ void CBasePlayer_RemoveAllItems(IReGameHook_CBasePlayer_RemoveAllItems *chain, C
 void CSGameRules_SendDeathMessage(IReGameHook_CSGameRules_SendDeathMessage *chain, CBaseEntity *pKiller, CBasePlayer *pVictim, CBasePlayer *pAssister, entvars_t *pevInflictor, const char *killerWeaponName, int iDeathMessageFlags, int iRarityOfKill);
 void CBasePlayerItem_Materialize(IReGameHook_CBasePlayerItem_Materialize *chain, CBasePlayerItem *pthis);
 void CBasePlayerItem_CheckRespawn(IReGameHook_CBasePlayerItem_CheckRespawn *chain, CBasePlayerItem *pthis);
+void CBasePlayer_UpdateStatusBar(IReGameHook_CBasePlayer_UpdateStatusBar *chain, CBasePlayer *pthis);
+void CBasePlayer_TakeDamageImpulse(IReGameHook_CBasePlayer_TakeDamageImpulse *chain, CBasePlayer *pthis, CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier);
 
 /*
 * VTC functions

@@ -129,4 +129,14 @@ public:
 	virtual void SetName(const char* name) = 0;
 	virtual class ISteamGameServer *GetSteamGameServer() = 0;
 	virtual struct netadr_s *GetNetFrom() = 0;
+	virtual double GetOldTime() = 0;
+
+	virtual void SetNetFrom(struct netadr_s *from) = 0;
+	virtual void SetWorldmapCrc(uint32 crcValue) = 0;
+	virtual void SetDecalNameNum(int num) = 0;
+
+	virtual bool IsActive() = 0;
+	virtual void SetActive(bool state) = 0;
+	virtual bool IsPaused() = 0;
+	virtual void SetPaused(bool state) = 0;
 };

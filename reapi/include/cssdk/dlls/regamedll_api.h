@@ -40,7 +40,7 @@
 #include <API/CSInterfaces.h>
 
 #define REGAMEDLL_API_VERSION_MAJOR 5
-#define REGAMEDLL_API_VERSION_MINOR 27
+#define REGAMEDLL_API_VERSION_MINOR 30
 
 // CBasePlayer::Spawn hook
 typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_Spawn;
@@ -638,6 +638,13 @@ typedef IHookChainRegistryClass<void, class CBasePlayerItem> IReGameHookRegistry
 typedef IHookChainClass<void, class CBasePlayerItem> IReGameHook_CBasePlayerItem_CheckRespawn;
 typedef IHookChainRegistryClass<void, class CBasePlayerItem> IReGameHookRegistry_CBasePlayerItem_CheckRespawn;
 
+// CBasePlayer::UpdateStatusBar hook
+typedef IHookChainClass<void, class CBasePlayer> IReGameHook_CBasePlayer_UpdateStatusBar;
+typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBasePlayer_UpdateStatusBar;
+
+// CBasePlayer::TakeDamageImpulse hook
+typedef IHookChainClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHook_CBasePlayer_TakeDamageImpulse;
+typedef IHookChainRegistryClass<void, class CBasePlayer, class CBasePlayer *, float, float> IReGameHookRegistry_CBasePlayer_TakeDamageImpulse;
 
 class IReGameHookchains {
 public:
@@ -804,6 +811,8 @@ public:
 
 	virtual IReGameHookRegistry_CBasePlayerItem_Materialize *CBasePlayerItem_Materialize() = 0;
 	virtual IReGameHookRegistry_CBasePlayerItem_CheckRespawn *CBasePlayerItem_CheckRespawn() = 0;
+	virtual IReGameHookRegistry_CBasePlayer_UpdateStatusBar *CBasePlayer_UpdateStatusBar() = 0;
+	virtual IReGameHookRegistry_CBasePlayer_TakeDamageImpulse *CBasePlayer_TakeDamageImpulse() = 0;
 };
 
 struct ReGameFuncs_t {

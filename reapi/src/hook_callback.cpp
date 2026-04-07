@@ -1319,7 +1319,7 @@ CWeaponBox *CreateWeaponBox(IReGameHook_CreateWeaponBox *chain, CBasePlayerItem 
 		return indexOfPDataAmx(chain->callNext(getPrivate<CBasePlayerItem>(_pItem), getPrivate<CBasePlayer>(_pPlayerOwner), _modelName, vecOriginCopy, vecAnglesCopy, vecVelocityCopy, _lifeTime, _packAmmo));
 	};
 
-	return getPrivate<CWeaponBox>(callForward<size_t>(RG_CreateWeaponBox, original, indexOfEdictAmx(pItem->pev), indexOfEdictAmx(pPlayerOwner->pev), modelName, getAmxVector(vecOriginCopy), getAmxVector(vecAnglesCopy), getAmxVector(vecVelocityCopy), lifeTime, packAmmo));
+	return getPrivate<CWeaponBox>(callForward<size_t>(RG_CreateWeaponBox, original, indexOfPDataAmx(pItem), indexOfPDataAmx(pPlayerOwner), modelName, getAmxVector(vecOriginCopy), getAmxVector(vecAnglesCopy), getAmxVector(vecVelocityCopy), lifeTime, packAmmo));
 }
 
 CGib *SpawnHeadGib(IReGameHook_SpawnHeadGib *chain, entvars_t *pevVictim)
@@ -1787,6 +1787,26 @@ void CBasePlayerItem_CheckRespawn(IReGameHook_CBasePlayerItem_CheckRespawn *chai
 	callVoidForward(RG_CBasePlayerItem_CheckRespawn, original, indexOfEdict(pthis->pev));
 }
 
+
+void CBasePlayer_UpdateStatusBar(IReGameHook_CBasePlayer_UpdateStatusBar *chain, CBasePlayer *pthis)
+{
+	auto original = [chain](int _pthis)
+	{
+		chain->callNext(getPrivate<CBasePlayer>(_pthis));
+	};
+
+	callVoidForward(RG_CBasePlayer_UpdateStatusBar, original, indexOfEdict(pthis->pev));
+}
+
+void CBasePlayer_TakeDamageImpulse(IReGameHook_CBasePlayer_TakeDamageImpulse *chain, CBasePlayer *pthis, CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier)
+{
+	auto original = [chain](int _pthis, int _pAttacker, float _flKnockbackForce, float _flVelModifier)
+	{
+		chain->callNext(getPrivate<CBasePlayer>(_pthis), getPrivate<CBasePlayer>(_pAttacker), _flKnockbackForce, _flVelModifier);
+	};
+
+	callVoidForward(RG_CBasePlayer_TakeDamageImpulse, original, indexOfEdict(pthis->pev), indexOfEdict(pAttacker->pev), flKnockbackForce, flVelModifier);
+}
 
 /*
 * VTC functions
