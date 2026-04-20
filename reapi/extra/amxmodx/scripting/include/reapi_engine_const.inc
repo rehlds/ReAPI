@@ -191,6 +191,13 @@ enum EngineFunc
 	*/
 	RH_SV_SendResources,
 
+	/*
+	* Description:  Called when a BSP entity checks collision with another entity.
+	* Return type:  bool
+	* Params:       (const entity, const client)
+	*/
+	RH_SV_TestEntityPosition,
+
 };
 
 /**
