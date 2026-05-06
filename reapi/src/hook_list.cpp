@@ -145,6 +145,7 @@ hook_t hooklist_gamedll[] = {
 	DLL(AddMultiDamage),
 	DLL(ApplyMultiDamage),
 	DLL(BuyItem),
+	DLL(SendSayMessage),
 };
 
 hook_t hooklist_animating[] = {

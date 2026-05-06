@@ -1772,7 +1772,7 @@ void CBasePlayer_UpdateStatusBar(IReGameHook_CBasePlayer_UpdateStatusBar *chain,
 	{
 		chain->callNext(getPrivate<CBasePlayer>(_pthis));
 	};
-
+	
 	callVoidForward(RG_CBasePlayer_UpdateStatusBar, original, indexOfEdict(pthis->pev));
 }
 
@@ -1782,8 +1782,18 @@ void CBasePlayer_TakeDamageImpulse(IReGameHook_CBasePlayer_TakeDamageImpulse *ch
 	{
 		chain->callNext(getPrivate<CBasePlayer>(_pthis), getPrivate<CBasePlayer>(_pAttacker), _flKnockbackForce, _flVelModifier);
 	};
-
+	
 	callVoidForward(RG_CBasePlayer_TakeDamageImpulse, original, indexOfEdict(pthis->pev), indexOfEdict(pAttacker->pev), flKnockbackForce, flVelModifier);
+}
+
+void SendSayMessage(IReGameHook_SendSayMessage *chain, CBasePlayer *pPlayer, const char *pszCmd, BOOL teamonly, const char *pszText, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
+{
+	auto original = [chain](int _pPlayer, const char *_pszCmd, BOOL _teamonly, const char *_pszText, const char *_pszFormat, const char *_pszConsoleFormat, bool _bSenderDead, const char *_placeName, bool _consoleUsesPlaceName)
+	{
+		chain->callNext(getPrivate<CBasePlayer>(_pPlayer), _pszCmd, _teamonly, _pszText, _pszFormat, _pszConsoleFormat, _bSenderDead, _placeName, _consoleUsesPlaceName);
+	};
+
+	callVoidForward(RG_SendSayMessage, original, indexOfEdict(pPlayer->pev), pszCmd, teamonly, pszText, pszFormat, pszConsoleFormat, bSenderDead, placeName, consoleUsesPlaceName);
 }
 
 /*
