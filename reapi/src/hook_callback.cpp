@@ -1786,6 +1786,16 @@ void CBasePlayer_TakeDamageImpulse(IReGameHook_CBasePlayer_TakeDamageImpulse *ch
 	callVoidForward(RG_CBasePlayer_TakeDamageImpulse, original, indexOfEdict(pthis->pev), indexOfEdict(pAttacker->pev), flKnockbackForce, flVelModifier);
 }
 
+void CBasePlayer_HandleSignals(IReGameHook_CBasePlayer_HandleSignals *chain, CBasePlayer *pthis)
+{
+	auto original = [chain](int _pthis)
+	{
+		return chain->callNext(getPrivate<CBasePlayer>(_pthis));
+	};
+
+	callVoidForward(RG_CBasePlayer_HandleSignals, original, indexOfEdict(pthis->pev));
+}
+
 void SendSayMessage(IReGameHook_SendSayMessage *chain, CBasePlayer *pPlayer, const char *pszCmd, BOOL teamonly, const char *pszText, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName)
 {
 	auto original = [chain](int _pPlayer, const char *_pszCmd, BOOL _teamonly, const char *_pszText, const char *_pszFormat, const char *_pszConsoleFormat, bool _bSenderDead, const char *_placeName, bool _consoleUsesPlaceName)
