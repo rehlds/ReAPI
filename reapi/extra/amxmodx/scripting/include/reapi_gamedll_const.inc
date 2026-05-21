@@ -487,6 +487,12 @@ enum GamedllFunc
 	* Params:           (const pPlayer, iSlot)
 	*/
 	RG_BuyItem,
+
+	/*
+	* Description:      Called when player says a message in server chat 
+	* Params:           (const pPlayer, const szCmd[], bool:teamonly, const szText[], const pszFormat[], const pszConsoleFormat[], bool:bSenderDead, const placeName[], bool:consoleUsesPlaceName)
+	*/
+	RG_SendSayMessage,
 };
 
 /**

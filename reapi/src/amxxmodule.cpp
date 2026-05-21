@@ -238,7 +238,13 @@ char* getAmxString(cell* src, char* dest, size_t max, size_t* len)
 
 void setAmxString(cell* dest, const char* string, size_t max)
 {
-	while (*string && max--)
+	if (!dest || max == 0)
+		return;
+
+	// reserve 1 cell for term null
+	size_t limit = max - 1;
+
+	while (*string && limit--)
 		*dest++ = (cell)*string++;
 
 	*dest = 0;

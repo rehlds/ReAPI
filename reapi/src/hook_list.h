@@ -161,6 +161,7 @@ enum GamedllFunc
 	RG_AddMultiDamage,
 	RG_ApplyMultiDamage,
 	RG_BuyItem,
+	RG_SendSayMessage,
 
 	// [...]
 };

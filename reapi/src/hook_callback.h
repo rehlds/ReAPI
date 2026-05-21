@@ -577,6 +577,7 @@ void CSGameRules_SendDeathMessage(IReGameHook_CSGameRules_SendDeathMessage *chai
 void CBasePlayer_UpdateStatusBar(IReGameHook_CBasePlayer_UpdateStatusBar *chain, CBasePlayer *pthis);
 void CBasePlayer_TakeDamageImpulse(IReGameHook_CBasePlayer_TakeDamageImpulse *chain, CBasePlayer *pthis, CBasePlayer *pAttacker, float flKnockbackForce, float flVelModifier);
 void CBasePlayer_HandleSignals(IReGameHook_CBasePlayer_HandleSignals *chain, CBasePlayer *pthis);
+void SendSayMessage(IReGameHook_SendSayMessage *chain, CBasePlayer *pPlayer, const char *pszCmd, BOOL teamonly, const char *pszText, const char *pszFormat, const char *pszConsoleFormat, bool bSenderDead, const char *placeName, bool consoleUsesPlaceName);
 
 /*
 * VTC functions
