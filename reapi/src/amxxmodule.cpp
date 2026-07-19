@@ -238,13 +238,11 @@ char* getAmxString(cell* src, char* dest, size_t max, size_t* len)
 
 void setAmxString(cell* dest, const char* string, size_t max)
 {
-	if (!dest || max == 0)
+	if (!dest)
 		return;
 
-	// reserve 1 cell for term null
-	size_t limit = max - 1;
-
-	while (*string && limit--)
+	// max is the number of chars without the terminator, like charsmax() in Pawn
+	while (*string && max--)
 		*dest++ = (cell)*string++;
 
 	*dest = 0;
