@@ -112,8 +112,8 @@ cell AMX_NATIVE_CALL REU_SetConnectTime(AMX* amx, cell* params)
 	CHECK_ISPLAYER(arg_index);
 
 	int clientId = params[arg_index] - 1;
-
-	g_ReunionApi->SetConnectTime(clientId, arg_time);
+	float time = CAmxArg(amx, params[arg_time]);
+	g_ReunionApi->SetConnectTime(clientId, time);
 	
 	return TRUE;
 }
