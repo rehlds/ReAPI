@@ -219,6 +219,7 @@ hook_t hooklist_player[] = {
 	DLL(CBasePlayer_RemoveAllItems),
 	DLL(CBasePlayer_UpdateStatusBar),
 	DLL(CBasePlayer_TakeDamageImpulse),
+	DLL(CBasePlayer_HandleSignals),
 };
 
 hook_t hooklist_gamerules[] = {
