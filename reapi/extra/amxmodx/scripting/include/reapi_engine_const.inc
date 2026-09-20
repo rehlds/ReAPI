@@ -191,6 +191,13 @@ enum EngineFunc
 	*/
 	RH_SV_SendResources,
 
+	/*
+	* Description:  Called when an entity checks collision with another entity.
+	* Return type:  int
+	* Params:       (const entity)
+	*/
+	RH_SV_TestEntityPosition,
+
 };
 
 /**
