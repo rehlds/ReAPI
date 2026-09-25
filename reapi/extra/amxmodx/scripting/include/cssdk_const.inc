@@ -204,6 +204,7 @@
 #define PLAYER_PREVENT_DUCK             (1<<4)
 #define PLAYER_PREVENT_CLIMB            (1<<5) // The player can't climb ladder
 #define PLAYER_PREVENT_JUMP             (1<<6)
+#define PLAYER_PREVENT_DDUCK			(1<<7) // The player can't double duck
 
 /**
 * Instant damage values for use with the 3rd parameter of the "Damage" client
