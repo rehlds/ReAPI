@@ -882,6 +882,63 @@ native rg_send_bartime2(const index, const duration, const Float:startPercent, c
 native rg_send_audio(const index, const sample[], const pitch = PITCH_NORM);
 
 /**
+* Sends a HUD message using the new queue system without formatting.
+*
+* @param index        Client index, use 0 to display to all players
+* @param message      Message to send
+* @param red          Red color component
+* @param green        Green color component
+* @param blue         Blue color component
+* @param x            X position
+* @param y            Y position
+* @param effects      Effects
+* @param fxtime       FX Time
+* @param holdtime     Hold time
+* @param fadeintime   Fade in time
+* @param fadeouttime  Fade out time
+* @param channel      Channel
+*
+* @noreturn
+*/
+native rg_send_hudmessage(const index, const message[], const red = 200, const green = 100, const blue = 0, const Float:x = -1.0, const Float:y = 0.35, const effects = 0, const Float:fxtime = 6.0, const Float:holdtime = 12.0, const Float:fadeintime = 0.1, const Float:fadeouttime = 0.2, const channel = 0);
+
+stock Float:__rg_hud_params[10];
+stock __rg_hud_colors[4];
+
+/**
+* Simulates the old set_hudmessage by saving parameters to globals.
+*/
+stock rg_set_hudmessage(red=200, green=100, blue=0, Float:x=-1.0, Float:y=0.35, effects=0, Float:fxtime=6.0, Float:holdtime=12.0, Float:fadeintime=0.1, Float:fadeouttime=0.2, channel=0) {
+    __rg_hud_colors[0] = red;
+    __rg_hud_colors[1] = green;
+    __rg_hud_colors[2] = blue;
+    __rg_hud_colors[3] = channel;
+
+    __rg_hud_params[0] = x;
+    __rg_hud_params[1] = y;
+    __rg_hud_params[2] = float(effects);
+    __rg_hud_params[3] = fxtime;
+    __rg_hud_params[4] = holdtime;
+    __rg_hud_params[5] = fadeintime;
+    __rg_hud_params[6] = fadeouttime;
+}
+
+/**
+* Simulates the old show_hudmessage, automatically formatting the text and pushing to the queue.
+*/
+stock rg_show_hudmessage(const index, const message[], any:...) {
+    new buffer[512];
+    vformat(buffer, charsmax(buffer), message, 3);
+    
+    rg_send_hudmessage(index, buffer, 
+        __rg_hud_colors[0], __rg_hud_colors[1], __rg_hud_colors[2], 
+        __rg_hud_params[0], __rg_hud_params[1], 
+        floatround(__rg_hud_params[2]), // effects
+        __rg_hud_params[3], __rg_hud_params[4], __rg_hud_params[5], __rg_hud_params[6], 
+        __rg_hud_colors[3]);
+}
+
+/**
 * Sets a parameter of the member CSPlayerItem::m_ItemInfo
 *
 * @param entity Entity index

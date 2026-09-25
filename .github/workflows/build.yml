@@ -126,10 +126,14 @@ jobs:
         # https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md
         run: |
                $pfxBase64 = "${{ secrets.KEY_PFX_B64 }}"
-               [IO.File]::WriteAllBytes("${{ github.workspace }}\signing-cert.pfx", [Convert]::FromBase64String($pfxBase64))
-               certutil -f -p "${{ secrets.KEY_PFX_PASS }}" -importPFX "${{ github.workspace }}\signing-cert.pfx"
-               & 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x86\signtool.exe' sign /a /f "${{ github.workspace }}\signing-cert.pfx"  /p $env:KEY_PFX_PASS /d "ReAPI - AMX Mod X module, using API regamedll & rehlds" /du "https://rehlds.dev/" /tr "http://timestamp.digicert.com" /td sha256 /fd sha256 /v ${{ github.workspace }}\publish\addons\amxmodx\modules\reapi_amxx.dll
-               Remove-Item -Recurse -Force "${{ github.workspace }}\signing-cert.pfx"
+               if (-not [string]::IsNullOrWhiteSpace($pfxBase64)) {
+                 [IO.File]::WriteAllBytes("${{ github.workspace }}\signing-cert.pfx", [Convert]::FromBase64String($pfxBase64))
+                 certutil -f -p "${{ secrets.KEY_PFX_PASS }}" -importPFX "${{ github.workspace }}\signing-cert.pfx"
+                 & 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x86\signtool.exe' sign /a /f "${{ github.workspace }}\signing-cert.pfx"  /p $env:KEY_PFX_PASS /d "ReAPI - AMX Mod X module, using API regamedll & rehlds" /du "https://rehlds.dev/" /tr "http://timestamp.digicert.com" /td sha256 /fd sha256 /v ${{ github.workspace }}\publish\addons\amxmodx\modules\reapi_amxx.dll
+                 Remove-Item -Recurse -Force "${{ github.workspace }}\signing-cert.pfx"
+               } else {
+                 Write-Host "PFX certificate not provided, skipping signature."
+               }
         shell: "pwsh"
 
       - name: Deploy artifacts
@@ -180,47 +184,48 @@ jobs:
           fetch-depth: 0
 
       - name: GPG Import
-        run: |
-          echo "${{ secrets.PUB_ASC }}" > "${{ secrets.PUB_ASC_FILE }}"
-          echo "${{ secrets.KEY_ASC }}" > "${{ secrets.KEY_ASC_FILE }}"
-
-          # Import the public key
-          gpg --batch --yes --import "${{ secrets.PUB_ASC_FILE }}"
-          if [[ $? -ne 0 ]]; then
-            echo "Error: Failed to import the public key"
-            exit 1
-          fi
-          
-          # Import the private key
-          gpg --batch --yes --import "${{ secrets.KEY_ASC_FILE }}"
-          if [[ $? -ne 0 ]]; then
-            echo "Error: Failed to import the private key"
-            exit 2
-          fi
-          
-          # Extract the fingerprint of the imported public key
-          GPG_LINUX_FINGERPRINT=$(gpg --list-keys --with-colons | grep '^fpr' | head -n 1 | cut -d: -f10)
-          
-          # Check if the fingerprint was extracted
-          if [[ -z "$GPG_LINUX_FINGERPRINT" ]]; then
-            echo "Error: Failed to extract the fingerprint of the key"
-            exit 3
-          fi
-          
-          # Set the trust level for the key
-          echo "$GPG_LINUX_FINGERPRINT:6:" | gpg --batch --import-ownertrust
-          if [ $? -ne 0 ]; then
-            echo "Error: Failed to set trust for the key $GPG_LINUX_FINGERPRINT"
-            exit 4
-          fi
-          
-          echo "Key $GPG_LINUX_FINGERPRINT successfully imported and trusted"
-          gpg --list-keys
-
-          #export for global use
-          echo "GPG_LINUX_FINGERPRINT=$GPG_LINUX_FINGERPRINT" >> $GITHUB_ENV
-        shell: bash
         if: github.event_name != 'pull_request'
+        run: |
+          if [ -n "${{ secrets.PUB_ASC }}" ]; then
+            # Import the public key
+            gpg --batch --yes --import <(echo "${{ secrets.PUB_ASC }}")
+            if [[ $? -ne 0 ]]; then
+              echo "Error: Failed to import the public key"
+              exit 1
+            fi
+            
+            # Import the private key
+            gpg --batch --yes --import <(echo "${{ secrets.KEY_ASC }}")
+            if [[ $? -ne 0 ]]; then
+              echo "Error: Failed to import the private key"
+              exit 2
+            fi
+            
+            # Extract the fingerprint of the imported public key
+            GPG_LINUX_FINGERPRINT=$(gpg --list-keys --with-colons | grep '^fpr' | head -n 1 | cut -d: -f10)
+            
+            # Check if the fingerprint was extracted
+            if [[ -z "$GPG_LINUX_FINGERPRINT" ]]; then
+              echo "Error: Failed to extract the fingerprint of the key"
+              exit 3
+            fi
+            
+            # Set the trust level for the key
+            echo "$GPG_LINUX_FINGERPRINT:6:" | gpg --batch --import-ownertrust
+            if [ $? -ne 0 ]; then
+              echo "Error: Failed to set trust for the key $GPG_LINUX_FINGERPRINT"
+              exit 4
+            fi
+            
+            echo "Key $GPG_LINUX_FINGERPRINT successfully imported and trusted"
+            gpg --list-keys
+
+            #export for global use
+            echo "GPG_LINUX_FINGERPRINT=$GPG_LINUX_FINGERPRINT" >> $GITHUB_ENV
+          else
+            echo "GPG keys not provided, skipping signature."
+          fi
+        shell: bash
 
       - name: Build
         run: |
@@ -294,28 +299,31 @@ jobs:
           startsWith(github.ref, 'refs/tags/')
         run: |
         
-          # new runner, niw signs
-          echo "${{ secrets.PUB_ASC }}" > "${{ secrets.PUB_ASC_FILE }}"
-          echo "${{ secrets.KEY_ASC }}" > "${{ secrets.KEY_ASC_FILE }}"
-          gpg --batch --yes --import "${{ secrets.PUB_ASC_FILE }}"
-          gpg --batch --yes --import "${{ secrets.KEY_ASC_FILE }}"
-          GPG_LINUX_FINGERPRINT=$(gpg --list-keys --with-colons | grep '^fpr' | head -n 1 | cut -d: -f10)
-          echo "$GPG_LINUX_FINGERPRINT:6:" | gpg --batch --import-ownertrust
-          echo "GPG_LINUX_FINGERPRINT=$GPG_LINUX_FINGERPRINT" >> $GITHUB_ENV
-
-          sign_file() {
-            local file=$1
-            gpg --batch --yes --detach-sign --armor -u "$GPG_LINUX_FINGERPRINT" "$file"
-            if [ $? -ne 0 ]; then
-              echo "Error: Failed to sign $file"
-              exit 2
-            fi
-            echo "$file signed successfully."
-          }
-          
-          # Pack and sign final archive
+          # Pack final archive
           7z a -tzip reapi-bin-${{ needs.linux.outputs.app-version }}.zip addons/
-          sign_file "reapi-bin-${{ needs.linux.outputs.app-version }}.zip"
+          
+          # new runner, niw signs
+          if [ -n "${{ secrets.PUB_ASC }}" ]; then
+            gpg --batch --yes --import <(echo "${{ secrets.PUB_ASC }}")
+            gpg --batch --yes --import <(echo "${{ secrets.KEY_ASC }}")
+            GPG_LINUX_FINGERPRINT=$(gpg --list-keys --with-colons | grep '^fpr' | head -n 1 | cut -d: -f10)
+            echo "$GPG_LINUX_FINGERPRINT:6:" | gpg --batch --import-ownertrust
+            echo "GPG_LINUX_FINGERPRINT=$GPG_LINUX_FINGERPRINT" >> $GITHUB_ENV
+
+            sign_file() {
+              local file=$1
+              gpg --batch --yes --detach-sign --armor -u "$GPG_LINUX_FINGERPRINT" "$file"
+              if [ $? -ne 0 ]; then
+                echo "Error: Failed to sign $file"
+                exit 2
+              fi
+              echo "$file signed successfully."
+            }
+
+            sign_file "reapi-bin-${{ needs.linux.outputs.app-version }}.zip"
+          else
+            echo "GPG keys not provided, skipping signature."
+          fi
 
       - name: Publish artifacts
         uses: softprops/action-gh-release@v2
