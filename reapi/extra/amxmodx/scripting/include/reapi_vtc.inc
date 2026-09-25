@@ -43,7 +43,7 @@ native bool:VTC_IsClientMuted(const index);
 * Play the audio file via the voice stream.
 *
 * @param receiver       Receiver index
-* @param soundFilePath  The path to the sound file
+* @param soundFilePath  The path to the sound file, relative to the game directory; must be a valid PCM WAV file (8 or 16 bit)
 *
 * @note Usage example:
 *       VTC_PlaySound(id, "sound/ambience/Opera.wav");

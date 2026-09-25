@@ -3620,7 +3620,7 @@ enum MapNameType { MNT_TRUE, MNT_SET };
 * @param output     Buffer to copy map name to
 * @param len        Maximum buffer size
 * @param type       MNT_SET will return the name of the current map
-*                   MNT_TRUE will return the original map name independant of the name set with via rh_set_mapname
+*                   MNT_TRUE will return the original map name independent of the name set via rh_set_mapname
 *
 * @noreturn
 *

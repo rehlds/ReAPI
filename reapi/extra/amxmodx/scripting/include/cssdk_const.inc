@@ -13,6 +13,8 @@
 #define MAX_WEAPONS                     32
 #define MAX_CLIENTS                     32                  // Max # of clients allowed in a server.
 #define MAX_ITEM_TYPES                  6                   // hud item selection slots
+#define MAX_AMMO_SLOTS                  32                  // not really slots
+#define MAX_ITEMS                       4                   // hard coded item types
 
 #define MAX_EDICT_BITS                  11                  // How many bits to use to encode an edict. # of bits needed to represent max edicts
 #define MAX_EDICTS                      (1<<MAX_EDICT_BITS) // Max # of edicts in a level (2048)
@@ -36,6 +38,7 @@
 #define IN_RELOAD                       (1<<13)
 #define IN_ALT1                         (1<<14)
 #define IN_SCORE                        (1<<15) // Used by client.dll for when scoreboard is held down
+#define IN_ACTIVE                       (IN_ATTACK|IN_ATTACK2|IN_JUMP|IN_DUCK|IN_FORWARD|IN_BACK|IN_MOVELEFT|IN_MOVERIGHT) // ReGameDLL: active movement/attack buttons mask
 
 /**
 * get_entvar(entity, var_flags) values
@@ -114,7 +117,7 @@
 #define DEAD_NO                         0 // Alive
 #define DEAD_DYING                      1 // Playing death animation or still falling off of a ledge waiting to hit ground
 #define DEAD_DEAD                       2 // Dead, lying still
-#define DEAD_RESPAWNABLE                3
+#define DEAD_RESPAWNABLE                3 // do respawn the entity
 #define DEAD_DISCARDBODY                4
 
 /**
@@ -204,6 +207,54 @@
 #define PLAYER_PREVENT_DUCK             (1<<4)
 #define PLAYER_PREVENT_CLIMB            (1<<5) // The player can't climb ladder
 #define PLAYER_PREVENT_JUMP             (1<<6)
+#define PLAYER_PREVENT_DDUCK            (1<<7) // ReGameDLL: player data iuser3 (unduck logic)
+
+/**
+* Player's throw direction on killed for use with m_iThrowDirection
+*/
+enum ThrowDirection
+{
+	THROW_NONE,
+	THROW_FORWARD,
+	THROW_BACKWARD,
+	THROW_HITVEL,
+	THROW_BOMB,
+	THROW_GRENADE,
+	THROW_HITVEL_MINUS_AIRVEL
+};
+
+/**
+* Player's status bar constants
+*/
+#define SBAR_TARGETTYPE_TEAMMATE        1
+#define SBAR_TARGETTYPE_ENEMY           2
+#define SBAR_TARGETTYPE_HOSTAGE         3
+
+enum sbar_data
+{
+	SBAR_ID_TARGETTYPE = 1,
+	SBAR_ID_TARGETNAME,
+	SBAR_ID_TARGETHEALTH,
+	SBAR_END
+};
+
+/**
+* Player id cvar extensions (ReGameDLL, #ifdef REGAMEDLL_ADD)
+*/
+enum PlayerIdShowHealth
+{
+	PLAYERID_HIDE      = 0, // Don't show health
+	PLAYERID_TEAMMATES = 1, // Show health for teammates only (default CS)
+	PLAYERID_ALL       = 2  // Show health for all players
+};
+
+enum PlayerIdField
+{
+	PLAYERID_FIELD_NONE   = 0, // No extra info
+	PLAYERID_FIELD_TEAM   = 1, // Show team name
+	PLAYERID_FIELD_HEALTH = 2, // Show health percentage
+	PLAYERID_FIELD_BOTH   = 3  // Show both team name and health
+};
 
 /**
 * Instant damage values for use with the 3rd parameter of the "Damage" client
@@ -234,6 +285,7 @@
 #define DMG_SLOWFREEZE                  (1<<22)     // In a subzero freezer
 #define DMG_MORTAR                      (1<<23)     // Hit by air raid (done to distinguish grenade from mortar)
 #define DMG_GRENADE                     (1<<24)     // Counter-Strike only - Hit by HE grenade
+#define DMG_EXPLOSION                   (1<<24)     // ReGameDLL name of the same bit as DMG_GRENADE (kept as alias)
 #define DMG_TIMEBASED                   (~(0x3fff)) // Mask for time-based damage
 
 // These are the damage types that are allowed to gib corpses
@@ -251,6 +303,20 @@
 #define GIB_ALWAYS                      2 // Always gib ( Houndeye Shock, Barnacle Bite )
 
 /**
+* Group operation codes (util.h)
+*/
+#define GROUP_OP_AND                    0
+#define GROUP_OP_NAND                   1
+
+/**
+* Dot products for view cone checking (util.h; for m_flFieldOfView)
+*/
+#define VIEW_FIELD_FULL                 -1.0 // +-180 degrees
+#define VIEW_FIELD_WIDE                 -0.7 // +-135 degrees
+#define VIEW_FIELD_NARROW               0.7  // +-45 degrees, more narrow check used to set up ranged attacks
+#define VIEW_FIELD_ULTRA_NARROW         0.9  // +-25 degrees, more narrow check used to set up ranged attacks
+
+/**
 * Player physics flags bits
 * CBasePlayer::m_afPhysicsFlags
 */
@@ -258,7 +324,7 @@
 #define PFLAG_ONSWING                   (1<<0)
 #define PFLAG_ONTRAIN                   (1<<1)
 #define PFLAG_ONBARNACLE                (1<<2)
-#define PFLAG_DUCKING                   (1<<3) // In the process of ducking, but totally squatted yet
+#define PFLAG_DUCKING                   (1<<3) // In the process of ducking, but not totally squatted yet
 #define PFLAG_USING                     (1<<4) // Using a continuous entity
 #define PFLAG_OBSERVER                  (1<<5) // Player is locked in stationary cam mode. Spectators can move, observers can't.
 
@@ -284,6 +350,8 @@
 #define ITEM_FLAG_LIMITINWORLD          (1<<3)
 #define ITEM_FLAG_EXHAUSTIBLE           (1<<4)
 #define ITEM_FLAG_NOFIREUNDERWATER      (1<<5)
+#define ITEM_FLAG_EXHAUST_SECONDARYAMMO (1<<6)
+#define ITEM_FLAG_CUSTOM                (ITEM_FLAG_NOFIREUNDERWATER|ITEM_FLAG_EXHAUST_SECONDARYAMMO)
 
 /**
 * @section get_entvar(entity, var_spawnflags) values
@@ -315,6 +383,12 @@
 #define SF_BUTTON_TOGGLE                32  // Button stays pushed until reactivated
 #define SF_BUTTON_SPARK_IF_OFF          64  // Button sparks in OFF state
 #define SF_BUTTON_TOUCH_ONLY            256 // Button only fires as a result of USE key.
+
+/**
+* env_spark
+*/
+#define SF_SPARK_TOOGLE                 BIT(5) // TOOGLE spelling is preserved from the C++ source
+#define SF_SPARK_IF_OFF                 BIT(6) // Spark in OFF state
 
 /**
 * func_rot_button
@@ -481,6 +555,9 @@
 #define SF_GAMECOUNT_FIREONCE           0x0001 // Remove entity after firing.
 #define SF_GAMECOUNT_RESET              0x0002 // Reset entity Initial value after fired.
 #define SF_GAMECOUNT_OVER_LIMIT         0x0004 // Fire a target when initial value is higher than limit value.
+#define SF_GAMECOUNTSET_FIREONCE        BIT(0)  // game_counter_set: remove entity after firing
+
+#define SF_GAME_PZONE_ONLY_ALIVE        BIT(0)  // game_zone_player: Only Alive Players
 
 /**
 * game_player_equip
@@ -488,6 +565,7 @@
 #define MAX_EQUIP                       32
 #define SF_PLAYEREQUIP_USEONLY          0x0001 // If set, the game_player_equip entity will not equip respawning players,
                                                // but only react to direct triggering, equipping its activator. This makes its master obsolete.
+#define SF_PLAYEREQUIP_REMOVEWEAPONS    BIT(1)  // Remove all weapons before give.
 
 /**
 * game_player_team
@@ -501,6 +579,11 @@
 */
 #define SF_PLAT_TOGGLE                  0x0001 // The lift is no more automatically called from top and activated by stepping on it.
                                                // It required trigger to do so.
+
+/**
+* func_guntarget
+*/
+#define SF_GUNTARGET_START_ON           BIT(0) // The entity starts moving
 
 /**
 * func_trackchange
@@ -640,7 +723,7 @@
 #define SF_PUSH_BREAKABLE               128
 
 /**
-* light_spawn
+* light
 */
 #define SF_LIGHT_START_OFF              1
 
@@ -682,8 +765,8 @@
 * PlaybackEvent flags
 */
 #define FEV_NOTHOST                     (1<<0) // Skip local host for event send.
-#define FEV_RELIABLE                    (1<<1) // Send the event reliably. You must specify the origin and angles
-                                               // for this to work correctly on the server for anything
+#define FEV_RELIABLE                    (1<<1) // Send the event reliably. You must specify the origin and angles and use
+                                               // PLAYBACK_EVENT_FULL for this to work correctly on the server for anything
                                                // that depends on the event origin/angles. I.e., the origin/angles are not
                                                // taken from the invoking edict for reliable events.
 
@@ -694,6 +777,39 @@
 #define FEV_HOSTONLY                    (1<<4) // Only send to entity specified as the invoker
 #define FEV_SERVER                      (1<<5) // Only send if the event was created on the server.
 #define FEV_CLIENT                      (1<<6) // Only issue event client side ( from shared code )
+
+/**
+* ScreenFade message flags (rehlds shake.h)
+*/
+#define FFADE_IN                        0x0000 // Just here so we don't pass 0 into the function
+#define FFADE_OUT                       0x0001 // Fade out (not in)
+#define FFADE_MODULATE                  0x0002 // Modulate (don't blend)
+#define FFADE_STAYOUT                   0x0004 // Ignores the duration, stays faded out until new ScreenFade message received
+#define FFADE_LONGFADE                  0x0008 // Used to indicate the fade can be longer than 16 seconds (added for czero)
+
+#define CHAN_BOT                        501    // ReHLDS: channel used for bot chatter
+
+/**
+* User-message payload constants
+*/
+#define BOMB_FLAG_DROPPED               0
+#define BOMB_FLAG_PLANTED               1
+
+#define STATUSICON_HIDE                 0
+#define STATUSICON_SHOW                 1
+#define STATUSICON_FLASH                2
+
+#define HUD_PRINTNOTIFY                 1
+#define HUD_PRINTCONSOLE                2
+#define HUD_PRINTTALK                   3
+#define HUD_PRINTCENTER                 4
+#define HUD_PRINTRADIO                  5 // No analog in AMXX print_* constants
+
+#define STATUS_NIGHTVISION_ON           1
+#define STATUS_NIGHTVISION_OFF          0
+
+#define ITEM_STATUS_NIGHTVISION         BIT(0)
+#define ITEM_STATUS_DEFUSER             BIT(1)
 
 /**
 * Cap bits to indicate what an object's capabilities are, currently used for
@@ -715,9 +831,37 @@
 #define FCAP_FORCE_TRANSITION           0x00000080 // ALWAYS goes across transitions
 
 /**
+* CBasePlayer::m_flDisplayHistory hint flags (ReGameDLL hintmessage.h)
+*/
+#define DHF_ROUND_STARTED               BIT(1)
+#define DHF_HOSTAGE_SEEN_FAR            BIT(2)
+#define DHF_HOSTAGE_SEEN_NEAR           BIT(3)
+#define DHF_HOSTAGE_USED                BIT(4)
+#define DHF_HOSTAGE_INJURED             BIT(5)
+#define DHF_HOSTAGE_KILLED              BIT(6)
+#define DHF_FRIEND_SEEN                 BIT(7)
+#define DHF_ENEMY_SEEN                  BIT(8)
+#define DHF_FRIEND_INJURED              BIT(9)
+#define DHF_FRIEND_KILLED               BIT(10)
+#define DHF_ENEMY_KILLED                BIT(11)
+#define DHF_BOMB_RETRIEVED              BIT(12)
+#define DHF_AMMO_EXHAUSTED              BIT(15)
+#define DHF_IN_TARGET_ZONE              BIT(16)
+#define DHF_IN_RESCUE_ZONE              BIT(17)
+#define DHF_IN_ESCAPE_ZONE              BIT(18)
+#define DHF_IN_VIPSAFETY_ZONE           BIT(19)
+#define DHF_NIGHTVISION                 BIT(20)
+#define DHF_HOSTAGE_CTMOVE              BIT(21)
+#define DHF_SPEC_DUCK                   BIT(22)
+
+#define DHM_ROUND_CLEAR                 (DHF_ROUND_STARTED|DHF_HOSTAGE_KILLED|DHF_FRIEND_KILLED|DHF_BOMB_RETRIEVED)
+#define DHM_CONNECT_CLEAR               (DHF_HOSTAGE_SEEN_FAR|DHF_HOSTAGE_SEEN_NEAR|DHF_HOSTAGE_USED|DHF_HOSTAGE_INJURED|DHF_FRIEND_SEEN|DHF_ENEMY_SEEN|DHF_FRIEND_INJURED|DHF_ENEMY_KILLED|DHF_AMMO_EXHAUSTED|DHF_IN_TARGET_ZONE|DHF_IN_RESCUE_ZONE|DHF_IN_ESCAPE_ZONE|DHF_IN_VIPSAFETY_ZONE|DHF_HOSTAGE_CTMOVE|DHF_SPEC_DUCK)
+
+/**
 * All monsters need this data
 */
 #define DONT_BLEED                      -1
+#define BLOOD_COLOR_DARKRED             223
 #define BLOOD_COLOR_RED                 247
 #define BLOOD_COLOR_YELLOW              195
 #define BLOOD_COLOR_GREEN               BLOOD_COLOR_YELLOW
@@ -725,11 +869,22 @@
 /**
 * CBasePlayer::m_iIgnoreGlobalChat
 */
-enum
+enum IgnoreChatMsg
 {
 	IGNOREMSG_NONE,  // Nothing to do
 	IGNOREMSG_ENEMY, // To ignore any chat messages from the enemy
 	IGNOREMSG_TEAM   // Same as IGNOREMSG_ENEMY but ignore teammates
+}
+
+/**
+* CBasePlayer::m_musicState
+* @see regamedll/dlls/player.h (enum MusicState { SILENT, CALM, INTENSE })
+*/
+enum MusicState
+{
+	MUSIC_SILENT = 0,
+	MUSIC_CALM,
+	MUSIC_INTENSE
 }
 
 /**
@@ -745,7 +900,8 @@ enum HitBoxGroup
 	HITGROUP_RIGHTARM,
 	HITGROUP_LEFTLEG,
 	HITGROUP_RIGHTLEG,
-	HITGROUP_SHIELD
+	HITGROUP_SHIELD,
+	NUM_HITGROUPS
 };
 
 /**
@@ -815,6 +971,63 @@ enum RewardType
 	RT_INTO_GAME,
 	RT_VIP_KILLED,
 	RT_VIP_RESCUED_MYSELF
+};
+
+/**
+* Reward account amounts for RG_CBasePlayer_AddAccount / rg_add_account (ReGameDLL)
+*/
+enum RewardAccount
+{
+	REWARD_TARGET_BOMB                      = 3500,
+	REWARD_VIP_ESCAPED                      = 3500,
+	REWARD_VIP_ASSASSINATED                 = 3250,
+	REWARD_TERRORISTS_ESCAPED               = 3150,
+	REWARD_CTS_PREVENT_ESCAPE               = 3500,
+	REWARD_ESCAPING_TERRORISTS_NEUTRALIZED  = 3250,
+	REWARD_BOMB_DEFUSED                     = 3250,
+	REWARD_BOMB_PLANTED                     = 800,
+	REWARD_BOMB_EXPLODED                    = 3250,
+	REWARD_CTS_WIN                          = 3000,
+	REWARD_TERRORISTS_WIN                   = 3000,
+	REWARD_ALL_HOSTAGES_RESCUED             = 2500,
+
+	// the end round was by the expiration time
+	REWARD_TARGET_BOMB_SAVED                = 3250,
+	REWARD_HOSTAGE_NOT_RESCUED              = 3250,
+	REWARD_VIP_NOT_ESCAPED                  = 3250,
+
+	// loser bonus
+	REWARD_LOSER_BONUS_DEFAULT              = 1400,
+	REWARD_LOSER_BONUS_MIN                  = 1500,
+	REWARD_LOSER_BONUS_MAX                  = 3000,
+	REWARD_LOSER_BONUS_ADD                  = 500,
+
+	REWARD_RESCUED_HOSTAGE                  = 750,
+	REWARD_KILLED_ENEMY                     = 300,
+	REWARD_KILLED_VIP                       = 2500,
+	REWARD_VIP_HAVE_SELF_RESCUED            = 2500,
+
+	REWARD_TAKEN_HOSTAGE                    = 1000,
+	REWARD_TOOK_HOSTAGE_ACC                 = 100,
+	REWARD_TOOK_HOSTAGE                     = 150
+};
+
+/**
+* Penalty for team killing (ReGameDLL)
+*/
+enum PaybackForBadThing
+{
+	PAYBACK_FOR_KILLED_TEAMMATES = -3300
+};
+
+/**
+* Defuser allocation modes (mp_defuser_allocation)
+*/
+enum DefuserAllocation
+{
+	DEFUSERALLOCATION_NONE      = 0,
+	DEFUSERALLOCATION_RANDOM    = 1,
+	DEFUSERALLOCATION_ALL       = 2,
 };
 
 /**
@@ -910,19 +1123,272 @@ enum WeaponIdType
 };
 
 /**
+* Weapon bitfield masks for var_weapons
+*/
+#define WEAPON_SUIT                     31
+#define WEAPON_ALLWEAPONS               (~(1<<WEAPON_SUIT))
+
+/**
+* Weapon infinite ammo modes for m_iWeaponInfiniteAmmo (ReGameDLL, #ifdef REGAMEDLL_ADD)
+*/
+enum WeaponInfiniteAmmoMode
+{
+	WPNMODE_INFINITE_CLIP = 1,
+	WPNMODE_INFINITE_BPAMMO
+};
+
+/**
+* Ammo types (ReGameDLL weapontype.h; note: numbering differs from AMXX CsAmmoType)
+*/
+enum AmmoType
+{
+	AMMO_NONE,
+	AMMO_338MAGNUM,
+	AMMO_762NATO,
+	AMMO_556NATOBOX,
+	AMMO_556NATO,
+	AMMO_BUCKSHOT,
+	AMMO_45ACP,
+	AMMO_57MM,
+	AMMO_50AE,
+	AMMO_357SIG,
+	AMMO_9MM,
+	AMMO_FLASHBANG,
+	AMMO_HEGRENADE,
+	AMMO_SMOKEGRENADE,
+	AMMO_C4,
+
+	AMMO_MAX_TYPES
+};
+
+/**
+* Weapon autobuy class types (for m_iAutoBuyClassType / autobuy logic)
+*/
+enum AutoBuyClassType
+{
+	AUTOBUYCLASS_NONE           = 0,
+	AUTOBUYCLASS_PRIMARY        = BIT(0),
+	AUTOBUYCLASS_SECONDARY      = BIT(1),
+	AUTOBUYCLASS_AMMO           = BIT(2),
+	AUTOBUYCLASS_ARMOR          = BIT(3),
+	AUTOBUYCLASS_DEFUSER        = BIT(4),
+	AUTOBUYCLASS_PISTOL         = BIT(5),
+	AUTOBUYCLASS_SMG            = BIT(6),
+	AUTOBUYCLASS_RIFLE          = BIT(7),
+	AUTOBUYCLASS_SNIPERRIFLE    = BIT(8),
+	AUTOBUYCLASS_SHOTGUN        = BIT(9),
+	AUTOBUYCLASS_MACHINEGUN     = BIT(10),
+	AUTOBUYCLASS_GRENADE        = BIT(11),
+	AUTOBUYCLASS_NIGHTVISION    = BIT(12),
+	AUTOBUYCLASS_SHIELD         = BIT(13),
+};
+
+/**
+* Item default costs
+*/
+enum ItemCostType
+{
+	ASSAULTSUIT_PRICE   = 1000,
+	FLASHBANG_PRICE     = 200,
+	HEGRENADE_PRICE     = 300,
+	SMOKEGRENADE_PRICE  = 300,
+	KEVLAR_PRICE        = 650,
+	HELMET_PRICE        = 350,
+	NVG_PRICE           = 1250,
+	DEFUSEKIT_PRICE     = 200,
+};
+
+/**
+* Ammo default costs
+*/
+enum AmmoCostType
+{
+	AMMO_338MAG_PRICE       = 125,
+	AMMO_357SIG_PRICE       = 50,
+	AMMO_45ACP_PRICE        = 25,
+	AMMO_50AE_PRICE         = 40,
+	AMMO_556MM_PRICE        = 60,
+	AMMO_57MM_PRICE         = 50,
+	AMMO_762MM_PRICE        = 80,
+	AMMO_9MM_PRICE          = 20,
+	AMMO_BUCKSHOT_PRICE     = 65,
+	AMMO_FLASHBANG_PRICE    = FLASHBANG_PRICE,
+	AMMO_HEGRENADE_PRICE    = HEGRENADE_PRICE,
+	AMMO_SMOKEGRENADE_PRICE = SMOKEGRENADE_PRICE,
+};
+
+/**
+* Weapon default costs
+*/
+enum WeaponCostType
+{
+	AK47_PRICE      = 2500,
+	AWP_PRICE       = 4750,
+	DEAGLE_PRICE    = 650,
+	G3SG1_PRICE     = 5000,
+	SG550_PRICE     = 4200,
+	GLOCK18_PRICE   = 400,
+	M249_PRICE      = 5750,
+	M3_PRICE        = 1700,
+	M4A1_PRICE      = 3100,
+	AUG_PRICE       = 3500,
+	MP5NAVY_PRICE   = 1500,
+	P228_PRICE      = 600,
+	P90_PRICE       = 2350,
+	UMP45_PRICE     = 1700,
+	MAC10_PRICE     = 1400,
+	SCOUT_PRICE     = 2750,
+	SG552_PRICE     = 3500,
+	TMP_PRICE       = 1250,
+	USP_PRICE       = 500,
+	ELITE_PRICE     = 800,
+	FIVESEVEN_PRICE = 750,
+	XM1014_PRICE    = 3000,
+	GALIL_PRICE     = 2000,
+	FAMAS_PRICE     = 2250,
+	SHIELDGUN_PRICE = 2200,
+};
+
+/**
+* The default amount of ammo that comes with each gun when it spawns
+*/
+enum ClipGiveDefault
+{
+	P228_DEFAULT_GIVE           = 13,
+	GLOCK18_DEFAULT_GIVE        = 20,
+	SCOUT_DEFAULT_GIVE          = 10,
+	HEGRENADE_DEFAULT_GIVE      = 1,
+	XM1014_DEFAULT_GIVE         = 7,
+	C4_DEFAULT_GIVE             = 1,
+	MAC10_DEFAULT_GIVE          = 30,
+	AUG_DEFAULT_GIVE            = 30,
+	SMOKEGRENADE_DEFAULT_GIVE   = 1,
+	ELITE_DEFAULT_GIVE          = 30,
+	FIVESEVEN_DEFAULT_GIVE      = 20,
+	UMP45_DEFAULT_GIVE          = 25,
+	SG550_DEFAULT_GIVE          = 30,
+	GALIL_DEFAULT_GIVE          = 35,
+	FAMAS_DEFAULT_GIVE          = 25,
+	USP_DEFAULT_GIVE            = 12,
+	AWP_DEFAULT_GIVE            = 10,
+	MP5NAVY_DEFAULT_GIVE        = 30,
+	M249_DEFAULT_GIVE           = 100,
+	M3_DEFAULT_GIVE             = 8,
+	M4A1_DEFAULT_GIVE           = 30,
+	TMP_DEFAULT_GIVE            = 30,
+	G3SG1_DEFAULT_GIVE          = 20,
+	FLASHBANG_DEFAULT_GIVE      = 1,
+	DEAGLE_DEFAULT_GIVE         = 7,
+	SG552_DEFAULT_GIVE          = 30,
+	AK47_DEFAULT_GIVE           = 30,
+	//KNIFE_DEFAULT_GIVE        = 1,
+	P90_DEFAULT_GIVE            = 50,
+};
+
+/**
+* Weapon clip sizes
+*/
+enum ClipSizeType
+{
+	P228_MAX_CLIP       = 13,
+	GLOCK18_MAX_CLIP    = 20,
+	SCOUT_MAX_CLIP      = 10,
+	XM1014_MAX_CLIP     = 7,
+	MAC10_MAX_CLIP      = 30,
+	AUG_MAX_CLIP        = 30,
+	ELITE_MAX_CLIP      = 30,
+	FIVESEVEN_MAX_CLIP  = 20,
+	UMP45_MAX_CLIP      = 25,
+	SG550_MAX_CLIP      = 30,
+	GALIL_MAX_CLIP      = 35,
+	FAMAS_MAX_CLIP      = 25,
+	USP_MAX_CLIP        = 12,
+	AWP_MAX_CLIP        = 10,
+	MP5N_MAX_CLIP       = 30,
+	M249_MAX_CLIP       = 100,
+	M3_MAX_CLIP         = 8,
+	M4A1_MAX_CLIP       = 30,
+	TMP_MAX_CLIP        = 30,
+	G3SG1_MAX_CLIP      = 20,
+	DEAGLE_MAX_CLIP     = 7,
+	SG552_MAX_CLIP      = 30,
+	AK47_MAX_CLIP       = 30,
+	P90_MAX_CLIP        = 50,
+};
+
+/**
+* Weapon weights
+*/
+enum WeightWeapon
+{
+	P228_WEIGHT         = 5,
+	GLOCK18_WEIGHT      = 5,
+	SCOUT_WEIGHT        = 30,
+	HEGRENADE_WEIGHT    = 2,
+	XM1014_WEIGHT       = 20,
+	C4_WEIGHT           = 3,
+	MAC10_WEIGHT        = 25,
+	AUG_WEIGHT          = 25,
+	SMOKEGRENADE_WEIGHT = 1,
+	ELITE_WEIGHT        = 5,
+	FIVESEVEN_WEIGHT    = 5,
+	UMP45_WEIGHT        = 25,
+	SG550_WEIGHT        = 20,
+	GALIL_WEIGHT        = 25,
+	FAMAS_WEIGHT        = 75,
+	USP_WEIGHT          = 5,
+	AWP_WEIGHT          = 30,
+	MP5NAVY_WEIGHT      = 25,
+	M249_WEIGHT         = 25,
+	M3_WEIGHT           = 20,
+	M4A1_WEIGHT         = 25,
+	TMP_WEIGHT          = 25,
+	G3SG1_WEIGHT        = 20,
+	FLASHBANG_WEIGHT    = 1,
+	DEAGLE_WEIGHT       = 7,
+	SG552_WEIGHT        = 25,
+	AK47_WEIGHT         = 25,
+	P90_WEIGHT          = 26,
+	KNIFE_WEIGHT        = 0,
+};
+
+/**
+* Maximum ammo amounts (last 4 - ReGameDLL custom)
+*/
+enum MaxAmmoType
+{
+	MAX_AMMO_BUCKSHOT   = 32,
+	MAX_AMMO_9MM        = 120,
+	MAX_AMMO_556NATO    = 90,
+	MAX_AMMO_556NATOBOX = 200,
+	MAX_AMMO_762NATO    = 90,
+	MAX_AMMO_45ACP      = 100,
+	MAX_AMMO_50AE       = 35,
+	MAX_AMMO_338MAGNUM  = 30,
+	MAX_AMMO_57MM       = 100,
+	MAX_AMMO_357SIG     = 52,
+
+	// custom
+	MAX_AMMO_SMOKEGRENADE = 1,
+	MAX_AMMO_HEGRENADE    = 1,
+	MAX_AMMO_FLASHBANG    = 2,
+	MAX_AMMO_C4           = 1,
+};
+
+/**
 * For CBaseMonster::m_rgbTimeBasedDamage
-* prefix should be ITBD_
 */
 enum TimeBasedDamage
 {
-	ITDB_PARALYZE,
-	ITDB_NERVEGAS,
-	ITDB_POISON,
-	ITDB_RADIATION,
-	ITDB_DROWNRECOVER,
-	ITDB_ACID,
-	ITDB_SLOWBURN,
-	ITDB_SLOWFREEZE
+	ITBD_PARALYZE,
+	ITBD_NERVE_GAS,
+	ITBD_POISON,
+	ITBD_RADIATION,
+	ITBD_DROWN_RECOVER,
+	ITBD_ACID,
+	ITBD_SLOW_BURN,
+	ITBD_SLOW_FREEZE,
+	ITBD_END
 };
 
 /**
@@ -1035,6 +1501,15 @@ enum Activity
 };
 
 /**
+* Animation sequence constants (animation.h)
+*/
+#define NUM_BLENDING                9
+
+#define ANIM_SWIM_1                 8
+#define ANIM_SWIM_2                 9
+#define ANIM_FIRST_DEATH_SEQUENCE   101
+
+/**
 * WinStatus for RG_RoundEnd, rg_round_end
 */
 enum WinStatus
@@ -1075,6 +1550,24 @@ enum ScenarioEventEndRound
 	ROUND_GAME_COMMENCE,
 	ROUND_GAME_RESTART,
 	ROUND_GAME_OVER
+};
+
+/**
+* mp_round_infinite scenario block flags (ReGameDLL)
+*/
+enum
+{
+	SCENARIO_BLOCK_TIME_EXPRIRED       = BIT(0),  // flag "a"
+	SCENARIO_BLOCK_NEED_PLAYERS        = BIT(1),  // flag "b"
+	SCENARIO_BLOCK_VIP_ESCAPE          = BIT(2),  // flag "c"
+	SCENARIO_BLOCK_PRISON_ESCAPE       = BIT(3),  // flag "d"
+	SCENARIO_BLOCK_BOMB                = BIT(4),  // flag "e"
+	SCENARIO_BLOCK_TEAM_EXTERMINATION  = BIT(5),  // flag "f"
+	SCENARIO_BLOCK_HOSTAGE_RESCUE      = BIT(6),  // flag "g"
+	SCENARIO_BLOCK_VIP_ESCAPE_TIME     = BIT(7),  // flag "h"
+	SCENARIO_BLOCK_PRISON_ESCAPE_TIME  = BIT(8),  // flag "i"
+	SCENARIO_BLOCK_BOMB_TIME           = BIT(9),  // flag "j"
+	SCENARIO_BLOCK_HOSTAGE_RESCUE_TIME = BIT(10)  // flag "k"
 };
 
 /**
@@ -1131,6 +1624,51 @@ enum _Menu
 };
 
 /**
+* Team menu slots for RG_ShowVGUIMenu / RG_ShowMenu (ReGameDLL client.h)
+*/
+enum ChooseTeamMenuSlot
+{
+	MENU_SLOT_TEAM_UNDEFINED = -1,
+
+	MENU_SLOT_TEAM_TERRORIST = 1,
+	MENU_SLOT_TEAM_CT,
+	MENU_SLOT_TEAM_VIP,
+
+	MENU_SLOT_TEAM_RANDOM = 5,
+	MENU_SLOT_TEAM_SPECT
+};
+
+/**
+* VGUI buy menu slots
+*/
+enum VGUIMenuSlot
+{
+	VGUI_MenuSlot_Buy_Pistol = 1,
+	VGUI_MenuSlot_Buy_ShotGun,
+	VGUI_MenuSlot_Buy_SubMachineGun,
+	VGUI_MenuSlot_Buy_Rifle,
+	VGUI_MenuSlot_Buy_MachineGun,
+	VGUI_MenuSlot_Buy_PrimAmmo,
+	VGUI_MenuSlot_Buy_SecAmmo,
+	VGUI_MenuSlot_Buy_Item
+};
+
+/**
+* Buy item menu slots
+*/
+enum BuyItemMenuSlot
+{
+	MENU_SLOT_ITEM_VEST = 1,
+	MENU_SLOT_ITEM_VESTHELM,
+	MENU_SLOT_ITEM_FLASHGREN,
+	MENU_SLOT_ITEM_HEGREN,
+	MENU_SLOT_ITEM_SMOKEGREN,
+	MENU_SLOT_ITEM_NVG,
+	MENU_SLOT_ITEM_DEFUSEKIT,
+	MENU_SLOT_ITEM_SHIELD
+};
+
+/**
 * For CBasePlayer::m_flLastCommandTime[8]
 */
 enum TrackCommands
@@ -1164,9 +1702,9 @@ enum InventorySlotType
 */
 enum shieldgren_e
 {
-	SHIELDREN_IDLE = 4,
-	SHIELDREN_UP,
-	SHIELDREN_DOWN
+	SHIELDGREN_IDLE = 4,
+	SHIELDGREN_UP,
+	SHIELDGREN_DOWN
 };
 
 enum shieldgun_e
@@ -1195,7 +1733,7 @@ enum SignalState
 };
 
 /**
-* Weapon states of the following weapons: usp, elite, glock18, famas and m4a1.
+* Weapon states of the following weapons: usp, elite, glock18, famas, m4a1 and shield.
 */
 enum WeaponState
 {
@@ -1346,6 +1884,9 @@ enum InfoMapBuyParam
 #define BIG_EXPLOSION_VOLUME            2048
 #define NORMAL_EXPLOSION_VOLUME         1024
 #define SMALL_EXPLOSION_VOLUME          512
+#define WEAPON_ACTIVITY_VOLUME          64
+#define KNIFE_BODYHIT_VOLUME            128.0 // CBasePlayer::m_iWeaponVolume after a knife body hit (wpn_knife.cpp)
+#define KNIFE_WALLHIT_VOLUME            512.0 // m_iWeaponVolume multiplier after a knife wall hit: int(flVol * KNIFE_WALLHIT_VOLUME)
 
 /**
 * For CBasePlayer:m_iWeaponFlash
@@ -1363,6 +1904,7 @@ enum InfoMapBuyParam
 #define DEFAULT_SMALL_SNIPERS_ZOOM        40
 #define DEFAULT_AUG_SG552_ZOOM            55
 #define DEFAULT_NO_ZOOM                   90
+#define DEFAULT_FOV                       90 // canonical C++ name (cdll_dll.h); same value as DEFAULT_NO_ZOOM
 
 /**
 * Scoreboard attribute constants
@@ -1573,6 +2115,11 @@ enum DeathMessageFlags
 	// See enum KillRarity for details
 	PLAYERDEATH_KILLRARITY        = 0x004
 };
+
+/**
+* The number of kills to dominate a player (ReGameDLL)
+*/
+#define CS_KILLS_FOR_DOMINATION         4
 
 // Classifying various player kill methods in the game
 enum KillRarity

@@ -307,6 +307,7 @@ enum GamedllFunc
 
 	/*
 	* Description:      -
+	* Return type:      bool
 	* Params:           (WinStatus:status, ScenarioEventEndRound:event, Float:tmDelay)
 	*/
 	RG_RoundEnd,
@@ -331,6 +332,7 @@ enum GamedllFunc
 
 	/*
 	* Description:      -
+	* Return type:      BOOL
 	* Params:           (const index, const MenuChooseTeam:slot)
 	*/
 	RG_HandleMenu_ChooseTeam,
@@ -607,6 +609,7 @@ enum GamedllFunc_CBasePlayer
 
 	/*
 	* Description:      -
+	* Return type:      BOOL
 	* Params:           (const this, Float:flHealth, bitsDamageType)
 	*/
 	RG_CBasePlayer_TakeHealth,
@@ -712,12 +715,15 @@ enum GamedllFunc_CBasePlayer
 
 	/*
 	* Description:      -
+	* Return type:      bool
 	* Params:           (const this, infobuffer[], szNewName[])
 	*/
 	RG_CBasePlayer_SetClientUserInfoName,
 
 	/*
 	* Description:      -
+	* Return type:      CBasePlayer * (Entity index of observer target)
+	* @note             To override the return value use SetHookChainReturn(ATYPE_CLASSPTR, entityIndex)
 	* Params:           (const this, iPlayerIndex, bool:bSameTeam)
 	*/
 	RG_CBasePlayer_Observer_IsValidTarget,
@@ -762,6 +768,7 @@ enum GamedllFunc_CBasePlayer
 
 	/*
 	* Description:      -
+	* Return type:      bool
 	* Params:           (const this, ItemID:item, ItemRestType:type)
 	*/
 	RG_CBasePlayer_HasRestrictItem,
@@ -1002,9 +1009,11 @@ enum GamedllFunc_CBasePlayerWeapon
 
 	/*
 	* Description:      Called whenever player fires a weapon and shakes player screen (punchangles altering)
-	* @note             Weapons that use KickBack: AK47, AUG, FAMAS, GALIL, M249, M4A1, MAC10, MP5NAVY, P90, SG552, TMP, UMP45
+	* @note             Weapons that use KickBack: AK47, AUG, AWP, DEAGLE, ELITE, FAMAS, FIVESEVEN,
+	*                   G3SG1, GALIL, GLOCK18, M249, M3, MAC10, M4A1, MP5NAVY, P228, P90, SCOUT,
+	*                   SG550, SG552, TMP, UMP45, USP, XM1014
 	* Return type:      void
-	* Params:           (const this, Float:up_base, Float:lateral_base, Float:up_modifier, Float:lateral_modifier, Float:p_max, Float:lateral_max, direction_change)
+	* Params:           (const this, Float:up_base, Float:lateral_base, Float:up_modifier, Float:lateral_modifier, Float:up_max, Float:lateral_max, direction_change)
 	*/
 	RG_CBasePlayerWeapon_KickBack,
 
@@ -1831,17 +1840,17 @@ enum CSGameRules_Members
 
 	/*
 	* Description:      -
-	* Member type:      int
+	* Member type:      class CBasePlayer *
 	* Get params:       get_member_game(member);
-	* Set params:       set_member_game(member, value);
+	* Set params:       set_member_game(member, value); // entity index of player
 	*/
 	m_pVIP,
 
 	/*
 	* Description:      -
-	* Member type:      int [5]
+	* Member type:      class CBasePlayer * [5]
 	* Get params:       get_member_game(member, element);
-	* Set params:       set_member_game(member, value, element);
+	* Set params:       set_member_game(member, value, element); // entity index of player
 	*/
 	m_pVIPQueue,
 
@@ -2641,9 +2650,9 @@ enum CBasePlayer_Members
 
 	/*
 	* Description:      -
-	* Member type:      int
+	* Member type:      enum IgnoreChatMsg
 	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Set params:       set_member(index, member, value); // IGNOREMSG_*
 	*/
 	m_iIgnoreGlobalChat,
 
@@ -3976,7 +3985,7 @@ enum RebuyStruct
 
 	/*
 	* Description:      enum ArmorType
-	* Member type:      int
+	* Member type:      ArmorType
 	* Get params:       get_rebuy(RebuyHandle:handle, RebuyStruct:member);
 	* Set params:       set_rebuy(RebuyHandle:handle, RebuyStruct:member, value);
 	*/
@@ -4015,7 +4024,7 @@ enum PlayerMove
 	/*
 	* Description:      -
 	* Member type:      float
-	* Get params:       Float:get_pmove(const MoveVars:var);
+	* Get params:       Float:get_pmove(member);
 	* Set params:       set_pmove(const MoveVars:var, Float:value);
 	*/
 	pm_time,
@@ -4023,7 +4032,7 @@ enum PlayerMove
 	/*
 	* Description:      -
 	* Member type:      float
-	* Get params:       Float:get_pmove(const MoveVars:var);
+	* Get params:       Float:get_pmove(member);
 	* Set params:       set_pmove(const MoveVars:var, Float:value);
 	*/
 	pm_frametime,
@@ -4429,7 +4438,9 @@ enum PlayerMove
 	pm_numphysent,
 
 	/*
-	* Description:      -
+	* Description:      Pointer to the input command structure of the current player.
+	* @note             Pass the result into get_ucmd()/set_ucmd() natives (reapi_engine.inc)
+	*                   to access the usercmd fields, e.g. ucmd_sidemove.
 	* Member type:      struct usercmd_s *
 	* Get params:       get_pmove(member);
 	* Set params:       set_pmove(const PlayerMove:var, value);
@@ -5788,6 +5799,12 @@ enum CUMP45_Members
 */
 enum CSG550_Members
 {
+	/*
+	* Description:      -
+	* Member type:      int
+	* Get params:       get_member(index, member);
+	* Set params:       set_member(index, member, value);
+	*/
 	m_SG550_iShell = BEGIN_MEMBER_REGION(sg550),
 
 	/*
@@ -5853,8 +5870,8 @@ enum CFamas_Members
 	/*
 	* Description:      Basic damage that famas deals before any multiplier, such as hitgroup, armor, distance and bullet penetration in burst mode
 	* Member type:      float
-	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Get params:       Float:get_member(index, member);
+	* Set params:       set_member(index, member, Float:value);
 	*/
 	m_Famas_flBaseDamageBurst,
 };
@@ -5883,8 +5900,8 @@ enum CUSP_Members
 	/*
 	* Description:      Basic damage that usp deals before any multiplier, such as hitgroup, armor, distance and bullet penetration in silence mdoe
 	* Member type:      float
-	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Get params:       Float:get_member(index, member);
+	* Set params:       set_member(index, member, Float:value);
 	*/
 	m_USP_flBaseDamageSil,
 };
@@ -5998,6 +6015,12 @@ enum CM249_Members
 */
 enum CM3_Members
 {
+	/*
+	* Description:      -
+	* Member type:      int
+	* Get params:       get_member(index, member);
+	* Set params:       set_member(index, member, value);
+	*/
 	m_M3_iShell = BEGIN_MEMBER_REGION(m3),
 
 	/*
@@ -6049,8 +6072,8 @@ enum CM4A1_Members
 	/*
 	* Description:      Basic damage that m4a1 deals before any multiplier, such as hitgroup, armor, distance and bullet penetration in silence mdoe
 	* Member type:      float
-	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Get params:       Float:get_member(index, member);
+	* Set params:       set_member(index, member, Float:value);
 	*/
 	m_M4A1_flBaseDamageSil,
 };
@@ -6213,48 +6236,48 @@ enum CKnife_Members
 	/*
 	* Description:      Stab damage (default: 65.0)
 	* Member type:      float
-	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Get params:       Float:get_member(index, member);
+	* Set params:       set_member(index, member, Float:value);
 	*/
 	m_Knife_flStabBaseDamage,
 
 	/*
 	* Description:      Swing damage (default: 15.0)
 	* Member type:      float
-	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Get params:       Float:get_member(index, member);
+	* Set params:       set_member(index, member, Float:value);
 	*/
 	m_Knife_flSwingBaseDamage,
 
 	/*
 	* Description:      Fast Swing (first one) damage (default: 20.0)
 	* Member type:      float
-	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Get params:       Float:get_member(index, member);
+	* Set params:       set_member(index, member, Float:value);
 	*/
 	m_Knife_flSwingBaseDamage_Fast,
 
 	/*
 	* Description:      Stab distance (default: 32.0)
 	* Member type:      float
-	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Get params:       Float:get_member(index, member);
+	* Set params:       set_member(index, member, Float:value);
 	*/
 	m_Knife_flStabDistance,
 
 	/*
-	* Description:      Swing distance (default: 64.0)
+	* Description:      Swing distance (default: 48.0)
 	* Member type:      float
-	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Get params:       Float:get_member(index, member);
+	* Set params:       set_member(index, member, Float:value);
 	*/
 	m_Knife_flSwingDistance,
 
 	/*
 	* Description:      Back Stab damage multiplier (default: 3.0)
 	* Member type:      float
-	* Get params:       get_member(index, member);
-	* Set params:       set_member(index, member, value);
+	* Get params:       Float:get_member(index, member);
+	* Set params:       set_member(index, member, Float:value);
 	*/
 	m_Knife_flBackStabMultiplier,
 };

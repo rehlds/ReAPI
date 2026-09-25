@@ -124,7 +124,8 @@ enum
                      // @note Warning: Be very careful, using this type of return will skip calls for all following AMXX plugins
 
 	HC_BYPASS        // Skip calls for all following AMXX plugins, but call the original function
-                     // @note Warning: In PRE skips all forwards including POST forwards
+                     // @note Warning: Applies to void hookchains only: in PRE skips all forwards including POST forwards.
+                     // @note          For hookchains with a return value, HC_BYPASS acts like HC_CONTINUE.
 };
 
 /**
@@ -166,6 +167,7 @@ native HookChain:RegisterHookChain(ReAPIFunc:function_id, const callback[], post
 *
 * @param hook       The hook to stop
 *
+* @return           Returns true if the hook is successfully disabled, otherwise false
 */
 native bool:DisableHookChain(HookChain:hook);
 
@@ -185,6 +187,9 @@ native bool:EnableHookChain(HookChain:hook);
 * @param type       To specify the ATYPE_* parameter, look at the enum AType
 * @param value      The value to set the return to
 *
+* @return           Returns true on success, otherwise false
+*
+* @error            The type must exactly match the return type registered for the hook; ATYPE_TRACE is not supported.
 */
 native SetHookChainReturn(AType:type, any:...);
 
@@ -193,19 +198,20 @@ native SetHookChainReturn(AType:type, any:...);
 * This has no effect in pre hookchain.
 *
 * @param type       To specify the ATYPE_* parameter, look at the enum AType
-* @param [maxlen]   Max length of string (optional)
+* @param maxlen    Max length of string (required when type is ATYPE_STRING)
 *
-* @return           If an integer or boolean or one byte or float, array or everything else is passed via 1st argument and more
+* @return           Returns the hookchain return value (see SetHookChainReturn)
 */
 native any:GetHookChainReturn(AType:type, any:...);
 
 /*
 * Set hookchain argument.
-* This has no effect in post hookchain.
+* In post hookchain this does not affect the original function (it has already been called),
+* but subsequent post forwards will see the changed value.
 *
 * @param number     Number of argument
+* @param type       To specify the ATYPE_* parameter, look at the enum AType
 * @param value      New value
-* @param [maxlen]   Max length of string (optional)
 *
 * @return           Returns true if the function is successfully executed, otherwise false
 */
@@ -241,13 +247,13 @@ native bool:FClassnameIs(const entityIndex, const className[]);
 *
 * @param entity     Grenade entity
 *
-* @return           return enum's of WeaponIdType
+* @return           WeaponIdType enum value
 */
 native WeaponIdType:GetGrenadeType(const entityIndex);
 
 /*
 * Sets the view entity on a client.
-* This allows pfnSetView able to hooks.
+* This allows pfnSetView to be hooked.
 *
 * @param index       Client index
 * @param viewEntity  Entity index
@@ -256,10 +262,11 @@ native WeaponIdType:GetGrenadeType(const entityIndex);
 native engset_view(const index, const viewEntity);
 
 /*
-* Gets the return index of the current view entity on a client.
+* Gets the index of the current view entity on a client.
 *
 * @param index  Client index
 *
+* @return       View entity index, 0 if none
 */
 native get_viewent(const index);
 
