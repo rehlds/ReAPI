@@ -958,6 +958,13 @@ enum GamedllFunc_CBasePlayer
 	* Params:           (const this, attacker, Float:flKnockbackForce, Float:flVelModifier)
 	*/
 	RG_CBasePlayer_TakeDamageImpulse,
+
+	/*
+	* Description:      Called to update the player's zone signals (buy, bomb, rescue, escape and VIP safety zones).
+	*                   Normally runs at most once per 0.5 seconds for each player.
+	* Params:           (const this)
+	*/
+	RG_CBasePlayer_HandleSignals,
 };
 
 /**
