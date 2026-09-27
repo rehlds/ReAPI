@@ -226,6 +226,7 @@ enum ThrowDirection
 /**
 * Player's status bar constants
 */
+#define SBAR_TARGETTYPE_NONE            0
 #define SBAR_TARGETTYPE_TEAMMATE        1
 #define SBAR_TARGETTYPE_ENEMY           2
 #define SBAR_TARGETTYPE_HOSTAGE         3
