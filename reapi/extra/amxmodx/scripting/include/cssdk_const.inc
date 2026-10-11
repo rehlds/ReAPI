@@ -1588,3 +1588,13 @@ enum KillRarity
 	KILLRARITY_REVENGE          = 0x100, // Revenge by the killer
 	KILLRARITY_INAIR            = 0x200  // Killer was in the air (skill to deal with high inaccuracy)
 };
+
+/**
+* StatusIcon values for m_iObserverC4State and StatusIcon message
+*/
+enum
+{
+	STATUSICON_HIDE = 0,
+	STATUSICON_SHOW,
+	STATUSICON_FLASH
+};
