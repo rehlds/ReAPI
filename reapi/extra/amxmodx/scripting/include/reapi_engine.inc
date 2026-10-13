@@ -25,7 +25,7 @@ native any:get_entvar(const index, const EntVars:var, any:...);
 native set_ucmd(const ucmd, const UCmd:var, any:...);
 
 /*
-* Returns usercmd data from an entity.
+* Returns usercmd data from a usercmd structure handle (see get_pmove(pm_cmd)).
 * Use the ucmd_* UCmd enum
 */
 native any:get_ucmd(const ucmd, const UCmd:var, any:...);
@@ -33,19 +33,24 @@ native any:get_ucmd(const ucmd, const UCmd:var, any:...);
 /*
 * Sets netchan data.
 * Use the net_* NetChan enum
+*
+* @note index must be a connected client
 */
 native set_netchan(const index, const NetChan:var, any:...);
 
 /*
-* Returns metchan data from an client.
+* Returns netchan data from a client.
 * Use the net_* NetChan enum
+*
+* @note index must be a connected client
 */
 native any:get_netchan(const index, const NetChan:var, any:...);
 
 /*
 * Sets a NetAdr var.
 *
-* @param var        The specified mvar, look at the enum NetAdrVars
+* @param adr        Pointer/handle to a netadr structure (e.g. obtained via get_netchan(index, net_remote_address))
+* @param var        NetAdrVars member to set, look at the enum NetAdrVars
 *
 * @return           1 on success.
 */
@@ -54,9 +59,10 @@ native set_netadr(const adr, const NetAdrVars:var, any:...);
 /*
 * Returns a NetAdr var
 *
-* @param var        The specified mvar, look at the enum NetAdrVars
+* @param adr        Pointer/handle to a netadr structure (e.g. obtained via get_netchan(index, net_remote_address))
+* @param var        NetAdrVars member to get, look at the enum NetAdrVars
 *
-* @return           If an integer or boolean or one byte, array or everything else is passed via the 3rd argument and more, look at the argument list for the specified mvar
+* @return           If an integer or boolean or one byte, array or everything else is passed via the 3rd argument and more, look at the argument list for the specified member
 */
 native any:get_netadr(const adr, const NetAdrVars:var, any:...);
 
@@ -88,11 +94,11 @@ native set_key_value(const pbuffer, const key[], const value[]);
 /*
 * Gets an AMXX string buffer from a infobuffer pointer
 *
-* @param buffer     Info string pointer
-* @param value      String to copy value to
+* @param pbuffer    Info string pointer
+* @param output     String to copy value to
 * @param maxlen     Maximum size of the output buffer
 *
-* @return           Returns a string buffer on infobuffer pointer
+* @return           Number of cells written to the output buffer
 */
 native get_key_value_buffer(const pbuffer, const output[], const maxlen);
 
@@ -208,7 +214,7 @@ native rh_set_mapname(const mapname[]);
 * @param output     Buffer to copy map name to
 * @param len        Maximum buffer size
 * @param type       MNT_SET will return the name of the current map
-*                   MNT_TRUE will return the original map name independant of the name set with via rh_set_mapname
+*                   MNT_TRUE will return the original map name independent of the name set via rh_set_mapname
 *
 * @noreturn
 */
@@ -260,7 +266,7 @@ native rh_update_user_info(const index);
 native rh_drop_client(const index, const message[] = "");
 
 /*
-* -
+* Returns the address string the most recent connection request came from (net_from).
 *
 * @param output     Buffer to copy the ip address
 * @param len        Maximum buffer size
@@ -275,7 +281,9 @@ native rh_get_net_from(output[], len);
 *
 * @param index      Client index
 *
-* @return           Netchan connection time in seconds or 0 if client index is invalid or client is not connected
+* @return           Netchan connection time in seconds
+*
+* @error            Invalid client index or client is not connected
 */
 native rh_get_client_connect_time(const index);
 
@@ -332,7 +340,7 @@ enum MessageHook
 *
 * @note The callback arguments have:
 *   msg_id          - Message id
-*   msg_dest        - Destination type (see MSG_* constants in messages_const.inc)
+*   msg_dest        - Destination type (see MSG_* constants in message_const.inc)
 *   msg_entity      - Entity receiving the message
 *
 * @note             You can modify the message content using SetMessageData native before the original function is invoked.
@@ -376,7 +384,7 @@ native bool:DisableHookMessage(const MessageHook:handle);
 * Sets the message data in the current game message.
 *
 * @param type       The type of the message data that can be changed
-* @param ...        Additional args depending on the type of the message argument being retrieved (For more details, look at the enum MsgArgType)
+* @param ...        Additional args depending on the type of the message argument being set (For more details, look at the enum MsgArgType)
 *
 * @return           Returns true if the message data is successfully set, otherwise false.
 */
@@ -447,13 +455,14 @@ native MsgBlockType:GetMessageBlock(const msgid);
 * This can be one of the following:
 *                   - MsgAny:      Check if any part of the message has been modified
 *                   - MsgDest:     Check if the destination has been modified
-*                   - MsgIndex:    Check if the message ID has been modified
+*                   - MsgMsgId:    Check if the message ID has been modified
 *                   - MsgOrigin:   Check if the origin has been modified
 *                   - MsgTargetId: Check if the index of the recipient client has been modified
 *                   - MsgArg:      Check if a specific argument of the message has been modified
 *
 * @param number     The number of the argument to check for modification (used only when type is MsgDataType:MsgArg)
-*                   Default value is -1, which means the argument number is not applicable
+*                   Default value is -1; allowed only when type is not MsgArg
+*                   (for MsgArg the argument number is required)
 *
 * @return           Returns true if the specified data type has been modified, false otherwise
 */
@@ -462,11 +471,11 @@ native bool:IsMessageDataModified(MsgDataType:type = MsgAny, const number = -1);
 /**
 * Resets a specific type of message data to its original value
 *
-* @param type       The type of the data to check for modification
+* @param type       The type of the data to reset
 * This can be one of the following:
 *                   - MsgAny:      Reset all modified message data to its original values
 *                   - MsgDest:     Reset the destination to its original value
-*                   - MsgIndex:    Reset the message ID to its original value
+*                   - MsgMsgId:    Reset the message ID to its original value
 *                   - MsgOrigin:   Reset the origin to its original value
 *                   - MsgTargetId: Reset the index of the recipient client to its original value
 *                   - MsgArg:      Reset a specific argument of the message to its original value

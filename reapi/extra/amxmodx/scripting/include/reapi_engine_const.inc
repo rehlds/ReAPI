@@ -9,7 +9,7 @@
 */
 enum MapNameType
 {
-	MNT_TRUE,   // return the original map name independant of the name set with via rh_set_mapname
+	MNT_TRUE,   // return the original map name independent of the name set via rh_set_mapname
 	MNT_SET     // return the name of the current map
 };
 
@@ -44,6 +44,7 @@ enum ResourceType_t
 */
 #define SND_EMIT2_NOPAS   BIT(0) // Never to check PAS
 #define SND_EMIT2_INVOKER BIT(1) // Do not send to the client invoker
+#define SND_EMIT2_USE_ORIGIN BIT(2) // use given origin instead of entity origin
 
 /**
 * enum EngineFunc
@@ -75,14 +76,17 @@ enum EngineFunc
 	RH_Cvar_DirectSet,
 
 	/*
-	* Description:  Receiver is player index or 0 when update will be sended to all.
+	* Description:  Receiver is player index or 0 when update will be sent to all.
 	* Params:       (const client, buffer, const receiver)
 	*/
 	RH_SV_WriteFullClientUpdate,
 
 	/*
 	* Description:  -
+	* Return type:  int
 	* Params:       (const classname[])
+	*
+	* @note          Returns the address of the entity class constructor function (advanced use only).
 	*/
 	RH_GetEntityInit,
 
@@ -99,7 +103,7 @@ enum EngineFunc
 	RH_SV_ConnectClient,
 
 	/*
-	* Description:  Called when client it's in the scoreboard
+	* Description:  Called when client is in the scoreboard
 	* Params:       (const client)
 	*/
 	RH_SV_EmitPings,
@@ -125,10 +129,12 @@ enum EngineFunc
 
 	/*
 	* Description:   Called when a player's userinfo is being checked.
+	* Return type:  int
 	* Params:        (adr, buffer, bool:reconnect, reconnectSlot, name[])
 	*
 	* @note          Param adr is unused, guaranteed to return nothing also, don't send anything through it.
 	* @note          In order for param name work, hook needs to be registered as Post.
+	* @note          Return 0 to reject the connection, 1 to continue.
 	*/
 	RH_SV_CheckUserInfo,
 
@@ -155,7 +161,7 @@ enum EngineFunc
 
 	/*
 	* Description:  Called when an event is being added to event precache list.
-	* Return type:  int
+	* Return type:  int (engine-side: unsigned short)
 	* Params:       (const string[])
 	*/
 	RH_EV_Precache,
@@ -182,6 +188,8 @@ enum EngineFunc
 	/*
 	* Description:  Called when a command is being sent to server.
 	* Params:       (const cmd[], source, id)
+	*
+	* @note          id is 0 unless source is a client
 	*/
 	RH_ExecuteServerStringCmd,
 
@@ -201,7 +209,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_classname = BEGIN_MEMBER_REGION(entvars),
@@ -209,7 +217,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_globalname,
@@ -247,7 +255,7 @@ enum EntVars
 	var_basevelocity,
 
 	/*
-	* Description:      Base velocity that was passed in to server physics so client can predict conveyors correctly. Server zeroes it, so we need to it store here, too.
+	* Description:      Base velocity that was passed in to server physics so client can predict conveyors correctly. Server zeroes it, so we need to store it here, too.
 	* Member type:      class Vector
 	* Get params:       get_entvar(index, EntVars:var, Float:output[3]);
 	* Set params:       set_entvar(index, EntVars:var, Float:dest[3]);
@@ -263,7 +271,7 @@ enum EntVars
 	var_movedir,
 
 	/*
-	* Description:      Angles model.
+	* Description:      Model angles.
 	* Member type:      class Vector
 	* Get params:       get_entvar(index, EntVars:var, Float:output[3]);
 	* Set params:       set_entvar(index, EntVars:var, Float:dest[3]);
@@ -377,7 +385,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_model,
@@ -385,7 +393,7 @@ enum EntVars
 	/*
 	* Description:      Player's viewmodel.
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_viewmodel,
@@ -393,7 +401,7 @@ enum EntVars
 	/*
 	* Description:      The model that other players see.
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_weaponmodel,
@@ -809,7 +817,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_target,
@@ -817,7 +825,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_targetname,
@@ -825,7 +833,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_netname,
@@ -833,7 +841,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_message,
@@ -873,7 +881,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_noise,
@@ -881,7 +889,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_noise1,
@@ -889,7 +897,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_noise2,
@@ -897,7 +905,7 @@ enum EntVars
 	/*
 	* Description:      -
 	* Member type:      string_t
-	* Get params:       get_entvar(index, EntVars:var, dest[], const lenght);
+	* Get params:       get_entvar(index, EntVars:var, dest[], const length);
 	* Set params:       set_entvar(index, EntVars:var, const source[]);
 	*/
 	var_noise3,
@@ -1287,7 +1295,7 @@ enum UCmd
 
 enum NetAdrType
 {
-	NA_NULL = 0,
+	NA_NULL = 0,	// "NA_UNUSED" in ReHLDS sources
 	NA_LOOPBACK,
 	NA_BROADCAST,
 	NA_IP,
@@ -1308,7 +1316,7 @@ enum NetAdrVars
 	/*
 	* Description:      -
 	* Member type:      unsigned char [4]
-	* Get params:       get_netadr(const NetAdr:adr, const NetAdrVars:var, dest[], const lenght); // Also returns a iplong value
+	* Get params:       get_netadr(const NetAdr:adr, const NetAdrVars:var, dest[], const length); // dest receives dotted string "A.B.C.D" (no port); also returns an iplong value
 	* Set params:       set_netadr(const NetAdr:adr, const NetAdrVars:var, const iplong_value); // Only iplong can to set
 	*/
 	netadr_ip,
@@ -1329,7 +1337,7 @@ enum NetSrc
 {
 	NS_CLIENT,
 	NS_SERVER,
-	NS_MULTICAST	// xxxMO
+	NS_MULTICAST
 };
 
 /**
@@ -1339,7 +1347,7 @@ enum NetChan
 {
 	/*
 	* Description:      NS_SERVER or NS_CLIENT, depending on channel
-	* Member type:      int
+	* Member type:      NetSrc
 	* Get params:       NetSrc:get_netchan(const index, NetChan:var);
 	* Set params:       set_netchan(const index, NetChan:var, NetSrc:value);
 	*/
@@ -1349,7 +1357,7 @@ enum NetChan
 	* Description:      Address this channel is talking to
 	* Member type:      NetAdr
 	* Get params:       NetAdr:get_netchan(const index, NetChan:var);
-	* Set params:       set_netchan(const index, NetChan:var, NetAdr:value);
+	* Set params:       set_netchan(const index, NetChan:var, NetAdr:value); // NOT IMPLEMENTED: the pointer cannot be set, mutate the address data via set_netadr() on the returned handle
 	*/
 	net_remote_address,
 
