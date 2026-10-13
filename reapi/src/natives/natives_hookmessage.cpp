@@ -1,6 +1,6 @@
 #include "precompiled.h"
 
-#define CHECK_PARAMBOUNDS(x, y) if (unlikely(x > (size_t)y)) { AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: invalid message argument %d/max:%d", __FUNCTION__, x, y); }
+#define CHECK_PARAMBOUNDS(x, y) if (unlikely(x > (size_t)y)) { AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: invalid message argument %d/max:%d", __FUNCTION__, x, y); return FALSE; }
 
 enum MessageHook
 {
@@ -320,7 +320,7 @@ cell AMX_NATIVE_CALL GetMessageOrigData(AMX *amx, cell *params)
 	case IMessage::DataType::Dest:
 		return static_cast<cell>(g_activeMessageContext->getOriginalDest());
 	case IMessage::DataType::Index:
-		return g_activeMessageContext->getId();
+		return g_activeMessageContext->getOriginalId();
 	case IMessage::DataType::Origin:
 		*(Vector *)getAmxAddr(amx, params[arg_value]) = g_activeMessageContext->getOriginalOrigin();
 		return TRUE;
