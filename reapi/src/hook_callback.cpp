@@ -258,6 +258,16 @@ void SV_SendResources(IRehldsHook_SV_SendResources *chain, sizebuf_t *msg)
 	SV_SendResources_AMXX(&data, g_RehldsFuncs->GetHostClient());
 }
 
+edict_t *SV_TestEntityPosition(IRehldsHook_SV_TestEntityPosition* chain, edict_t* ent)
+{
+	auto original = [chain](int _ent)
+	{
+		return indexOfEdict(chain->callNext(edictByIndexAmx(_ent)));
+	};
+
+	return edictByIndexAmx(callForward<int>(RH_SV_TestEntityPosition, original, indexOfEdict(ent)));
+}
+
 /*
 * ReGameDLL functions
 */
