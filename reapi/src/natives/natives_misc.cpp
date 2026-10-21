@@ -2139,6 +2139,65 @@ enum ItemInfo_e
 };
 
 /**
+* Sends a HUD message using the new queue system
+*
+* @param index        Client index, use 0 to display to all players
+* @param message      Message to send
+* @param red          Red color component
+* @param green        Green color component
+* @param blue         Blue color component
+* @param x            X position
+* @param y            Y position
+* @param effects      Effects
+* @param fxtime       FX Time
+* @param holdtime     Hold time
+* @param fadeintime   Fade in time
+* @param fadeouttime  Fade out time
+* @param channel      Channel
+*
+* @noreturn
+*/
+cell AMX_NATIVE_CALL rg_send_hudmessage(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_message, arg_red, arg_green, arg_blue, arg_x, arg_y, arg_effects, arg_fxtime, arg_holdtime, arg_fadeintime, arg_fadeouttime, arg_channel };
+
+	if (!g_ReGameApi)
+		return FALSE;
+
+	int nIndex = params[arg_index];
+	if (nIndex < 0 || nIndex > gpGlobals->maxClients) {
+		AMXX_LogError(amx, AMX_ERR_NATIVE, "Invalid player %d", nIndex);
+		return FALSE;
+	}
+
+	char message[512];
+	const char *szMessage = getAmxString(amx, params[arg_message], message);
+
+	hudtextparms_t textparms;
+	textparms.r1 = params[arg_red];
+	textparms.g1 = params[arg_green];
+	textparms.b1 = params[arg_blue];
+	textparms.a1 = 0;
+
+	textparms.r2 = 255; 
+	textparms.g2 = 255;
+	textparms.b2 = 250;
+	textparms.a2 = 0;
+
+	textparms.x = *(float *)&params[arg_x];
+	textparms.y = *(float *)&params[arg_y];
+	textparms.effect = params[arg_effects];
+	textparms.fxTime = *(float *)&params[arg_fxtime];
+	textparms.holdTime = *(float *)&params[arg_holdtime];
+	textparms.fadeinTime = *(float *)&params[arg_fadeintime];
+	textparms.fadeoutTime = *(float *)&params[arg_fadeouttime];
+	textparms.channel = params[arg_channel];
+
+	g_ReGameApi->QueueHudMessage(nIndex, textparms, szMessage);
+	return TRUE;
+}
+
+/**
 * Sets a parameter of the member CSPlayerItem::m_ItemInfo
 *
 * @param entity Entity index
@@ -3547,6 +3606,7 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_send_bartime",              rg_send_bartime              },
 	{ "rg_send_bartime2",             rg_send_bartime2             },
 	{ "rg_send_audio",                rg_send_audio                },
+	{ "rg_send_hudmessage",           rg_send_hudmessage           },
 
 	{ "rg_set_iteminfo",              rg_set_iteminfo              },
 	{ "rg_get_iteminfo",              rg_get_iteminfo              },
