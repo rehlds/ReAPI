@@ -3470,6 +3470,342 @@ cell AMX_NATIVE_CALL rg_trace_hull(AMX *amx, cell *params)
 	return TRUE;
 }
 
+/*
+* Gets the client's money (m_iAccount).
+*
+* @param index  Client index
+* @return       Current money amount
+*
+* native rg_get_user_account(const index);
+*/
+cell AMX_NATIVE_CALL rg_get_user_account(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	return g_ReGameFuncs->GetPlayerAccount(pPlayer);
+}
+
+/*
+* Sets the client's money (m_iAccount).
+*
+* @param index   Client index
+* @param amount  Money amount to set
+*
+* @noreturn
+*
+* native rg_set_user_account(const index, const amount);
+*/
+cell AMX_NATIVE_CALL rg_set_user_account(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_amount };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	g_ReGameFuncs->SetPlayerAccount(pPlayer, params[arg_amount]);
+	return TRUE;
+}
+
+/*
+* Sets the client's health.
+*
+* @param index   Client index
+* @param health  Health value to set
+*
+* @noreturn
+*
+* native rg_set_user_health(const index, const Float:health);
+*/
+cell AMX_NATIVE_CALL rg_set_user_health(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_health };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->SetPlayerHealth(pPlayer, args[arg_health]);
+	return TRUE;
+}
+
+/*
+* Gets the client's health.
+*
+* @param index  Client index
+* @return       Current health value
+*
+* native Float:rg_get_user_health(const index);
+*/
+cell AMX_NATIVE_CALL rg_get_user_health(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	float health = g_ReGameFuncs->GetPlayerHealth(pPlayer);
+	return *(cell *)&health;
+}
+
+/*
+* Sets the client's frags (score).
+*
+* @param index  Client index
+* @param frags  Frags value to set
+*
+* @noreturn
+*
+* native rg_set_user_frags(const index, const Float:frags);
+*/
+cell AMX_NATIVE_CALL rg_set_user_frags(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_frags };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->SetPlayerFrags(pPlayer, args[arg_frags]);
+	return TRUE;
+}
+
+/*
+* Sets the client's deaths.
+*
+* @param index   Client index
+* @param deaths  Deaths value to set
+*
+* @noreturn
+*
+* native rg_set_user_deaths(const index, const deaths);
+*/
+cell AMX_NATIVE_CALL rg_set_user_deaths(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_deaths };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	g_ReGameFuncs->SetPlayerDeaths(pPlayer, params[arg_deaths]);
+	return TRUE;
+}
+
+/*
+* Gets the client's team.
+*
+* @param index  Client index
+* @return       TeamName value
+*
+* native TeamName:rg_get_user_team(const index);
+*/
+cell AMX_NATIVE_CALL rg_get_user_team(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	return static_cast<cell>(g_ReGameFuncs->GetPlayerTeam(pPlayer));
+}
+
+/*
+* Checks if the client is alive.
+*
+* @param index  Client index
+* @return       true if alive, false otherwise
+*
+* native bool:rg_is_player_alive(const index);
+*/
+cell AMX_NATIVE_CALL rg_is_player_alive(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	return g_ReGameFuncs->IsPlayerAlive(pPlayer) ? TRUE : FALSE;
+}
+
+/*
+* Adds a bot to the specified team.
+*
+* @param team  Team to add the bot to (TERRORIST, CT, or UNASSIGNED for any)
+* @return      true on success, false otherwise
+*
+* native bool:rg_bot_add(const TeamName:team = UNASSIGNED);
+*/
+cell AMX_NATIVE_CALL rg_bot_add(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_team };
+
+	return g_ReGameFuncs->BotAdd(static_cast<TeamName>(params[arg_team])) ? TRUE : FALSE;
+}
+
+/*
+* Kicks a bot from the specified team.
+*
+* @param team  Team to kick a bot from
+* @return      true on success, false otherwise
+*
+* native bool:rg_bot_kick(const TeamName:team);
+*/
+cell AMX_NATIVE_CALL rg_bot_kick(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_team };
+
+	return g_ReGameFuncs->BotKick(static_cast<TeamName>(params[arg_team])) ? TRUE : FALSE;
+}
+
+/*
+* Applies a screen fade effect to the client.
+*
+* @param index      Client index
+* @param color      Fade color (RGB)
+* @param fadeTime   Fade duration
+* @param fadeHold   Hold duration
+* @param alpha      Fade alpha
+* @param flags      Fade flags
+*
+* @noreturn
+*
+* native rg_screen_fade(const index, const Float:color[3], const Float:fadeTime, const Float:fadeHold = 0.0, const alpha = 0, const flags = 0);
+*/
+cell AMX_NATIVE_CALL rg_screen_fade(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_color, arg_fade_time, arg_fade_hold, arg_alpha, arg_flags };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_ScreenFade(pPlayer, args[arg_color], args[arg_fade_time], args[arg_fade_hold], args[arg_alpha], args[arg_flags]);
+	return TRUE;
+}
+
+/*
+* Applies a screen shake effect within a radius.
+*
+* @param center      Shake center
+* @param amplitude   Shake amplitude
+* @param frequency   Shake frequency
+* @param duration    Shake duration
+* @param radius      Shake radius
+*
+* @noreturn
+*
+* native rg_screen_shake(const Float:center[3], const Float:amplitude, const Float:frequency, const Float:duration, const Float:radius);
+*/
+cell AMX_NATIVE_CALL rg_screen_shake(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_center, arg_amplitude, arg_frequency, arg_duration, arg_radius };
+
+	CAmxArgs args(amx, params);
+	g_ReGameFuncs->UTIL_ScreenShake(args[arg_center], args[arg_amplitude], args[arg_frequency], args[arg_duration], args[arg_radius]);
+	return TRUE;
+}
+
+/*
+* Sends a HUD message to the client.
+*
+* @param index    Client index
+* @param message  Message text
+* @param isHint   Whether the message is a hint
+*
+* @noreturn
+*
+* native rg_show_message(const index, const message[], const bool:isHint = false);
+*/
+cell AMX_NATIVE_CALL rg_show_message(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_index, arg_message, arg_is_hint };
+
+	CHECK_ISPLAYER(arg_index);
+
+	CBasePlayer *pPlayer = UTIL_PlayerByIndex(params[arg_index]);
+	CHECK_CONNECTED(pPlayer, arg_index);
+
+	char msg[512];
+	g_ReGameFuncs->UTIL_ShowMessage(getAmxString(amx, params[arg_message], msg), pPlayer, params[arg_is_hint] != 0);
+	return TRUE;
+}
+
+/*
+* Sends a HUD message to all clients.
+*
+* @param message  Message text
+* @param isHint   Whether the message is a hint
+*
+* @noreturn
+*
+* native rg_show_message_all(const message[], const bool:isHint = false);
+*/
+cell AMX_NATIVE_CALL rg_show_message_all(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_message, arg_is_hint };
+
+	char msg[512];
+	g_ReGameFuncs->UTIL_ShowMessageAll(getAmxString(amx, params[arg_message], msg), params[arg_is_hint] != 0);
+	return TRUE;
+}
+
+/*
+* Prints a text message to all clients.
+*
+* @param dest     Message destination (see HUD_* / print_* constants)
+* @param message  Message text
+*
+* @noreturn
+*
+* native rg_client_print_all(const dest, const message[]);
+*/
+cell AMX_NATIVE_CALL rg_client_print_all(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_dest, arg_message };
+
+	char msg[512];
+	g_ReGameFuncs->UTIL_ClientPrintAll(params[arg_dest], getAmxString(amx, params[arg_message], msg), nullptr, nullptr, nullptr, nullptr);
+	return TRUE;
+}
+
+/*
+* Sends a chat (SayText) message to all clients.
+*
+* @param message  Message text
+*
+* @noreturn
+*
+* native rg_say_text(const message[]);
+*/
+cell AMX_NATIVE_CALL rg_say_text(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_message };
+
+	char msg[512];
+	g_ReGameFuncs->UTIL_SayTextAll(getAmxString(amx, params[arg_message], msg), nullptr);
+	return TRUE;
+}
+
 AMX_NATIVE_INFO Misc_Natives_RG[] =
 {
 	{ "rg_set_animation",             rg_set_animation             },
@@ -3588,6 +3924,23 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_player_takedamage_impulse", rg_player_takedamage_impulse },
 	{ "rg_trace_line",                rg_trace_line                },
 	{ "rg_trace_hull",                rg_trace_hull                },
+
+	{ "rg_get_user_account",          rg_get_user_account          },
+	{ "rg_set_user_account",          rg_set_user_account          },
+	{ "rg_set_user_health",           rg_set_user_health           },
+	{ "rg_get_user_health",           rg_get_user_health           },
+	{ "rg_set_user_frags",            rg_set_user_frags            },
+	{ "rg_set_user_deaths",           rg_set_user_deaths           },
+	{ "rg_get_user_team",             rg_get_user_team             },
+	{ "rg_is_player_alive",           rg_is_player_alive           },
+	{ "rg_bot_add",                   rg_bot_add                   },
+	{ "rg_bot_kick",                  rg_bot_kick                  },
+	{ "rg_screen_fade",               rg_screen_fade               },
+	{ "rg_screen_shake",              rg_screen_shake              },
+	{ "rg_show_message",              rg_show_message              },
+	{ "rg_show_message_all",          rg_show_message_all          },
+	{ "rg_client_print_all",          rg_client_print_all          },
+	{ "rg_say_text",                  rg_say_text                  },
 
 	{ nullptr, nullptr }
 };
