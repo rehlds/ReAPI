@@ -3470,6 +3470,41 @@ cell AMX_NATIVE_CALL rg_trace_hull(AMX *amx, cell *params)
 	return TRUE;
 }
 
+/*
+* Checks if a position is inside a smoke cloud.
+*
+* @param pos  Position to check
+*
+* @return     true if the position is inside a smoke cloud, false otherwise
+*
+* native bool:rg_is_player_inside_smoke(const Float:pos[3]);
+*/
+cell AMX_NATIVE_CALL rg_is_player_inside_smoke(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_pos };
+
+	CAmxArgs args(amx, params);
+	return g_ReGameFuncs->IsInsideSmokeCloud(args[arg_pos]) ? TRUE : FALSE;
+}
+
+/*
+* Checks if a line segment between two points is blocked by a smoke cloud.
+*
+* @param from  Start position
+* @param to    End position
+*
+* @return      true if the line is obstructed by smoke, false otherwise
+*
+* native bool:rg_is_line_blocked_by_smoke(const Float:from[3], const Float:to[3]);
+*/
+cell AMX_NATIVE_CALL rg_is_line_blocked_by_smoke(AMX *amx, cell *params)
+{
+	enum args_e { arg_count, arg_from, arg_to };
+
+	CAmxArgs args(amx, params);
+	return g_ReGameFuncs->IsLineBlockedBySmoke(args[arg_from], args[arg_to]) ? TRUE : FALSE;
+}
+
 AMX_NATIVE_INFO Misc_Natives_RG[] =
 {
 	{ "rg_set_animation",             rg_set_animation             },
@@ -3588,6 +3623,9 @@ AMX_NATIVE_INFO Misc_Natives_RG[] =
 	{ "rg_player_takedamage_impulse", rg_player_takedamage_impulse },
 	{ "rg_trace_line",                rg_trace_line                },
 	{ "rg_trace_hull",                rg_trace_hull                },
+
+	{ "rg_is_player_inside_smoke",    rg_is_player_inside_smoke    },
+	{ "rg_is_line_blocked_by_smoke",  rg_is_line_blocked_by_smoke  },
 
 	{ nullptr, nullptr }
 };
