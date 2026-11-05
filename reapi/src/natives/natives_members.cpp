@@ -765,7 +765,7 @@ cell AMX_NATIVE_CALL set_netadr(AMX *amx, cell *params)
 		adr->port = ntohs(params[arg_value] & 0xFFFF); // cap short
 		break;
 	case netadr_ip:
-		*(size_t *)adr->ip = htonl(params[arg_value] & 0xFFFFFFFF); // cap int
+		*(unsigned int *)adr->ip = htonl(params[arg_value] & 0xFFFFFFFF); // cap int
 		break;
 	default:
 		return FALSE;
@@ -812,7 +812,7 @@ cell AMX_NATIVE_CALL get_netadr(AMX *amx, cell *params)
 			setAmxString(dest, NET_AdrToString(*adr, true /*no port*/), length);
 		}
 
-		return htonl(*(size_t *)adr->ip);
+		return htonl(*(unsigned int *)adr->ip);
 	}
 	default:
 		break;
