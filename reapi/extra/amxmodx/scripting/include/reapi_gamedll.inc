@@ -236,6 +236,161 @@ native rg_set_animation(const index, PLAYER_ANIM:playerAnim);
 native rg_add_account(const index, amount, AccountSet:typeSet = AS_ADD, const bool:bTrackChange = true);
 
 /*
+* Gets the client's money (m_iAccount).
+*
+* @param index  Client index
+* @return       Current money amount
+*/
+native rg_get_user_account(const index);
+
+/*
+* Sets the client's money (m_iAccount).
+*
+* @param index   Client index
+* @param amount  Money amount to set
+*
+* @noreturn
+*/
+native rg_set_user_account(const index, const amount);
+
+/*
+* Sets the client's health.
+*
+* @param index   Client index
+* @param health  Health value to set
+*
+* @noreturn
+*/
+native rg_set_user_health(const index, const Float:health);
+
+/*
+* Gets the client's health.
+*
+* @param index  Client index
+* @return       Current health value
+*/
+native Float:rg_get_user_health(const index);
+
+/*
+* Sets the client's frags (score).
+*
+* @param index  Client index
+* @param frags  Frags value to set
+*
+* @noreturn
+*/
+native rg_set_user_frags(const index, const Float:frags);
+
+/*
+* Sets the client's deaths.
+*
+* @param index   Client index
+* @param deaths  Deaths value to set
+*
+* @noreturn
+*/
+native rg_set_user_deaths(const index, const deaths);
+
+/*
+* Gets the client's team.
+*
+* @param index  Client index
+* @return       TeamName value
+*/
+native TeamName:rg_get_user_team(const index);
+
+/*
+* Checks if the client is alive.
+*
+* @param index  Client index
+* @return       true if alive, false otherwise
+*/
+native bool:rg_is_player_alive(const index);
+
+/*
+* Adds a bot to the specified team.
+*
+* @param team  Team to add the bot to (TERRORIST, CT, or UNASSIGNED for any)
+* @return      true on success, false otherwise
+*/
+native bool:rg_bot_add(const TeamName:team = UNASSIGNED);
+
+/*
+* Kicks a bot from the specified team.
+*
+* @param team  Team to kick a bot from
+* @return      true on success, false otherwise
+*/
+native bool:rg_bot_kick(const TeamName:team);
+
+/*
+* Applies a screen fade effect to the client.
+*
+* @param index      Client index
+* @param color      Fade color (RGB)
+* @param fadeTime   Fade duration
+* @param fadeHold   Hold duration
+* @param alpha      Fade alpha
+* @param flags      Fade flags
+*
+* @noreturn
+*/
+native rg_screen_fade(const index, const Float:color[3], const Float:fadeTime, const Float:fadeHold = 0.0, const alpha = 0, const flags = 0);
+
+/*
+* Applies a screen shake effect within a radius.
+*
+* @param center      Shake center
+* @param amplitude   Shake amplitude
+* @param frequency   Shake frequency
+* @param duration    Shake duration
+* @param radius      Shake radius
+*
+* @noreturn
+*/
+native rg_screen_shake(const Float:center[3], const Float:amplitude, const Float:frequency, const Float:duration, const Float:radius);
+
+/*
+* Sends a HUD message to the client.
+*
+* @param index    Client index
+* @param message  Message text
+* @param isHint   Whether the message is a hint
+*
+* @noreturn
+*/
+native rg_show_message(const index, const message[], const bool:isHint = false);
+
+/*
+* Sends a HUD message to all clients.
+*
+* @param message  Message text
+* @param isHint   Whether the message is a hint
+*
+* @noreturn
+*/
+native rg_show_message_all(const message[], const bool:isHint = false);
+
+/*
+* Prints a text message to all clients.
+*
+* @param dest     Message destination (see HUD_* / print_* constants)
+* @param message  Message text
+*
+* @noreturn
+*/
+native rg_client_print_all(const dest, const message[]);
+
+/*
+* Sends a chat (SayText) message to all clients.
+*
+* @param message  Message text
+*
+* @noreturn
+*/
+native rg_say_text(const message[]);
+
+/*
 * Gives the player an item.
 *
 * @param index      Client index
