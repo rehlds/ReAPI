@@ -36,12 +36,9 @@ bool VTC_Api_Init()
 		return false;
 	}
 
-	if (minorVersion < VOICETRANSCODER_API_VERSION_MINOR)
-	{
-		// Not fatal: the core VTC natives keep working with API 3.0,
-		// only the block API (VTC_BlockClient etc.) requires minor >= 1.
-		UTIL_ServerPrint("[%s]: VTC API minor version %d < %d; block natives (VTC_BlockClient/VTC_UnblockClient/VTC_IsClientBlocked) are not available. Please update the VTC up to a minor version API >= %d\n", Plugin_info.logtag, minorVersion, VOICETRANSCODER_API_VERSION_MINOR, VOICETRANSCODER_API_VERSION_MINOR);
-	}
+	// A minor version mismatch is not fatal and is not reported here: running an
+	// older VTC is the server owner's choice, and the only natives that need a
+	// newer minor version report the error themselves when they are called.
 
 	g_pVoiceTranscoderApi->OnClientStartSpeak() += OnClientStartSpeak;
 	g_pVoiceTranscoderApi->OnClientStopSpeak() += OnClientStopSpeak;
