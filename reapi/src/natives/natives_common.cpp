@@ -146,11 +146,11 @@ cell AMX_NATIVE_CALL amx_set_key_value_buffer(AMX *amx, cell *params)
 /*
 * Gets an AMXX string buffer from a infobuffer pointer
 *
-* @param buffer     Info string pointer
-* @param value      String to copy value to
+* @param pbuffer    Info string pointer
+* @param output     String to copy value to
 * @param maxlen     Maximum size of the output buffer
 *
-* @return           Returns a string buffer on infobuffer pointer
+* @return           Number of cells written to the output buffer
 *
 * native get_key_value_buffer(const pbuffer, const output[], const maxlen);
 */
@@ -313,13 +313,12 @@ cell AMX_NATIVE_CALL amx_GetAttachment(AMX *amx, cell *params)
 }
 
 /*
-* Sets body group value based on entity's model group
+* Gets body group value based on entity's model group
 *
 * @param entity     Entity index
 * @param group      Number of entity's model group index
-* @param value      Value to assign
 *
-* @return           1 on success, 0 otherwise
+* @return           Body group value
 * @error            If the index is not within the range of 1 to maxEntities or
 *                   the entity is not valid, an error will be thrown.
 *
@@ -345,12 +344,13 @@ cell AMX_NATIVE_CALL amx_GetBodygroup(AMX *amx, cell *params)
 }
 
 /*
-* Gets body group value based on entity's model group
+* Sets body group value based on entity's model group
 *
 * @param entity     Entity index
 * @param group      Number of entity's model group index
+* @param value      Value to assign
 *
-* @return           Body group value
+* @return           1 on success, 0 otherwise
 * @error            If the index is not within the range of 1 to maxEntities or
 *                   the entity is not valid, an error will be thrown.
 *

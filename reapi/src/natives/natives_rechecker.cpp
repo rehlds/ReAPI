@@ -22,7 +22,7 @@ cell AMX_NATIVE_CALL RegisterQueryFile(AMX *amx, cell *params)
 	case RES_TYPE_NONE:
 	case RES_TYPE_IGNORE:
 		AMXX_LogError(amx, AMX_ERR_NATIVE, "%s: invalid flag type \"%i\".", __FUNCTION__, flag);
-		break;
+		return FALSE;
 	case RES_TYPE_EXISTS:
 		if (params[arg_hash] == -1) {
 			flag = RES_TYPE_HASH_ANY;
