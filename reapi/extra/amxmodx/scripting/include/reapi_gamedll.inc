@@ -1274,3 +1274,22 @@ native rg_trace_line(Float:vecStart[3], Float:vecEnd[3], const ignoreMonsters, c
 * @noreturn
 */
 native rg_trace_hull(Float:vecStart[3], Float:vecEnd[3], const ignoreMonsters, const hullNumber, const ignoreEntity, const ptr, const traceFlags = 0);
+
+/*
+* Checks if a position is inside a smoke cloud.
+*
+* @param pos  Position to check
+*
+* @return     true if the position is inside a smoke cloud, false otherwise
+*/
+native bool:rg_is_player_inside_smoke(const Float:pos[3]);
+
+/*
+* Checks if a line segment between two points is blocked by a smoke cloud.
+*
+* @param from  Start position
+* @param to    End position
+*
+* @return      true if the line is obstructed by smoke, false otherwise
+*/
+native bool:rg_is_line_blocked_by_smoke(const Float:from[3], const Float:to[3]);
